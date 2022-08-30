@@ -1,0 +1,21 @@
+@import "../../common-styles/variables.scss";
+
+.alert {
+  width: 100%;
+  background-color: $white;
+  border-radius: $border-radius;
+  padding: 30px 18px;
+}
+
+.actions {
+  display: flex;
+  margin-top: 24px;
+
+  button {
+    width: 45%;
+  }
+
+  button + button {
+    margin-left: 5%;
+  }
+}

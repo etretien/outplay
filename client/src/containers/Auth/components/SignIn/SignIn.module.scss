@@ -1,0 +1,9 @@
+@import "../../../../common-styles/variables.scss";
+
+.avatar {
+  width: 200px;
+  height: 200px;
+  background-color: $white;
+  border-radius: 50%;
+  align-self: center;
+}

@@ -1,0 +1,118 @@
+@import "../../common-styles/variables.scss";
+
+.players {
+
+  padding-top: 130px;
+
+  h1 {
+    font-weight: 500;
+    font-size: 40px;
+    text-align: center;
+    width: 100%;
+  }
+}
+
+.filters {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filter {
+  width: 45%;
+}
+
+.filter + .filter {
+  margin-left: 5%;
+}
+
+.list {
+  margin-top: 60px;
+  width: 100%;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+}
+
+.player + .player {
+  margin-top: 16px;
+}
+
+.playerLoading {
+
+  .avatar {
+    min-width: 100px;
+    min-height: 100px;
+    background-color: $white;
+    border-radius: 50%;
+    animation: fade-in 1.6s infinite linear;
+  }
+
+  .info {
+    animation: fade-in 1.6s infinite linear;
+  }
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+
+  :global .avatar__flag {
+    width: 30px;
+    height: 22px;
+    right: 0;
+    bottom: 10px;
+  }
+}
+
+.info {
+  width: calc(100% - 100px - 33px);
+  margin-left: 33px;
+  background-color: $white;
+  border-radius: 32px;
+  height: 81px;
+}
+
+@media screen and (max-width: 600px) {
+
+  .filter {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .filter + .filter {
+    margin-left: 0;
+    margin-top: 5%;
+  }
+
+  .avatar {
+    width: 50px;
+    height: 50px;
+
+    :global .avatar__flag {
+      right: -12px;
+      bottom: -5px;
+    }
+  }
+
+  .info {
+    width: calc(100% - 50px - 33px);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.5;
+  }
+}

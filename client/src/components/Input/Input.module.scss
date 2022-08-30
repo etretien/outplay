@@ -1,0 +1,43 @@
+@import "../../common-styles/variables.scss";
+
+.input {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+
+  label {
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  input {
+    outline: none;
+    height: 67px;
+    border-radius: $border-radius;
+    border: unset;
+    background-color: $white;
+    width: 100%;
+    margin-top: 4px;
+    padding: 22px 16px 21px;
+    font-family: 'Inter', sans-serif;
+    font-size: 24px;
+  }
+
+  &.error {
+
+    input {
+      border: 1px solid red;
+    }
+  }
+}
+
+.inputError {
+  position: absolute;
+  bottom: -20px;
+  color: red;
+}
+
+.input + .input {
+  margin-top: 28px;
+}

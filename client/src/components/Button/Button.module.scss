@@ -1,0 +1,49 @@
+@import "../../common-styles/variables.scss";
+
+.button {
+  border: unset;
+  outline: unset;
+  display: block;
+  height: 75px;
+  font-size: 24px;
+  color: $white;
+  border-radius: $border-radius;
+  transition: background-color 200ms;
+  cursor: pointer;
+
+  &.m {
+    width: 50%;
+  }
+
+  &.l {
+    width: 100%;
+  }
+
+  &.blue {
+    background-color: $blue-500;
+
+    &:hover {
+      background-color: darken($blue-500, 5%);
+    }
+  }
+
+  &.green {
+    background-color: $green-500;
+
+    &:hover {
+      background-color: darken($green-500, 5%);
+    }
+  }
+
+  &.gray {
+    background-color: $gray-500;
+
+    &:hover {
+      background-color: darken($gray-500, 5%);
+    }
+  }
+
+  &.transparent {
+    background-color: transparent;
+  }
+}

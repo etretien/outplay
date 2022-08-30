@@ -1,0 +1,31 @@
+@import "../../common-styles/variables.scss";
+
+.menu {
+  width: 100%;
+  margin: 60px 0;
+}
+
+.list {
+  list-style: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0 18%;
+}
+
+.listItem {
+  font-size: 24px;
+
+  a {
+    text-decoration: none;
+    color: $black;
+  }
+}
+
+.listItemActive {
+  a {
+    color: $blue-500;
+  }
+}

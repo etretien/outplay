@@ -1,0 +1,80 @@
+@import "../../common-styles/variables.scss";
+
+.select {
+  position: relative;
+  width: 100%;
+  z-index: 9;
+}
+
+.result {
+  width: 100%;
+  cursor: pointer;
+
+  button {
+    background-color: $white;
+    border-radius: 22px;
+    height: 57px;
+    padding: 11px 58px 10px 27px;
+    color: $gray-400;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 36px;
+    outline: none;
+    border: unset;
+    width: 100%;
+    cursor: pointer;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.arrow {
+  width: 30px;
+  height: 14px;
+  position: absolute;
+  right: 21px;
+  top: 25px;
+}
+
+.options {
+  position: absolute;
+  top: 100%;
+  margin-top: 4px;
+  flex-direction: column;
+  background-color: $white;
+  border-radius: $border-radius;
+  width: 100%;
+  display: none;
+  box-shadow: 0px 7px 14px 0px rgba(34, 60, 80, 0.2);
+
+  button {
+    outline: none;
+    background-color: transparent;
+    border: unset;
+    text-align: left;
+    padding: 10px 27px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 200ms;
+
+    &:hover {
+      background-color: lighten($gray-400, 25%);
+    }
+
+    &:first-of-type {
+      border-top-left-radius: $border-radius;
+      border-top-right-radius: $border-radius;
+    }
+
+    &:last-of-type {
+      border-bottom-left-radius: $border-radius;
+      border-bottom-right-radius: $border-radius;
+    }
+  }
+}
+
+.optionsActive {
+  display: flex;
+}

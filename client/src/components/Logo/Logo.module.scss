@@ -1,0 +1,21 @@
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  span {
+    text-transform: capitalize;
+    font-size: 26px;
+    margin-left: -25px;
+  }
+
+  img {
+    width: 50px;
+    height: auto;
+  }
+
+  span:first-letter {
+    visibility: hidden;
+  }
+}

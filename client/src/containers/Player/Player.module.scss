@@ -1,0 +1,16 @@
+.player {
+  position: relative;
+}
+
+.notFound {
+  padding-top: 130px;
+  text-align: center;
+}
+
+.playerLoading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
