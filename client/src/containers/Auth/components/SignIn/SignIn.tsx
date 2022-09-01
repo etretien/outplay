@@ -11,6 +11,7 @@ import styles from '../../Auth.module.scss';
 
 type TProps = {
   onSingIn: (email: string, password: string) => void;
+  isLoading: boolean;
 };
 
 const SignIn = (props: TProps) => {
@@ -44,15 +45,17 @@ const SignIn = (props: TProps) => {
       <div className={currentStyles.avatar} />
       <h1>Sign In</h1>
       <FormWrapper onSubmit={handleApply}>
-        <Input id='email' label='Email' {...email} type='email' onChange={handleEmailChange} />
-        <Input
-          id='password'
-          label='Password'
-          {...password}
-          type='password'
-          onChange={handlePasswordChange}
-        />
-        <Button text='Sign in' size='l' type='submit' onClick={handleApply} />
+        <fieldset disabled={props.isLoading}>
+          <Input id='email' label='Email' {...email} type='email' onChange={handleEmailChange} />
+          <Input
+            id='password'
+            label='Password'
+            {...password}
+            type='password'
+            onChange={handlePasswordChange}
+          />
+          <Button text='Sign in' size='l' type='submit' onClick={() => {}} />
+        </fieldset>
       </FormWrapper>
     </div>
   );

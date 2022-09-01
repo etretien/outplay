@@ -16,6 +16,8 @@ type TProps = {
   placeholder?: string;
   selected: Option | null;
   options: Option[];
+  className?: string;
+  error?: string;
   onChange: (value: Option) => void;
 };
 
@@ -36,12 +38,13 @@ const Select = (props: TProps) => {
   };
 
   return (
-    <div className={styles.select} ref={selectRef}>
+    <div className={cn(styles.select, props.className, { [styles.selectError]: !!props.error })} ref={selectRef}>
       <div className={styles.result}>
         <button type='button' onClick={handleClick}>
           {props.selected?.text ?? props.placeholder ?? 'Select'}
         </button>
         <img className={styles.arrow} src={arrow} alt='arrow' onClick={handleClick} />
+        {props.error && <p className={styles.error}>{props.error}</p>}
       </div>
       <div className={cn(styles.options, { [styles.optionsActive]: optionsActive })}>
         {props.options.map((option) => (
