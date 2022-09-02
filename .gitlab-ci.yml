@@ -12,6 +12,7 @@ build:
     - npm ci
     - npm run build
     - tar -cvf artifacts.tar.gz dist/
+    - ls -la
   artifacts:
     name: "$CI_JOB_NAME"
     paths:
