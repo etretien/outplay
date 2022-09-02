@@ -9,7 +9,7 @@ build:
     - shared_build
   script:
     - cd client
-    - npm cl
+    - npm ci
     - npm build
   artifacts:
     paths:
