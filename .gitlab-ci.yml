@@ -1,0 +1,17 @@
+---
+stages:
+  - build
+
+build:
+  stage: build
+  image: node:16
+  tags:
+    - shared_build
+  script:
+    - cd client
+    - npm cl
+    - npm build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: "1 days"
