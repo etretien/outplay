@@ -12,6 +12,7 @@ build:
     - npm ci
     - npm run build
   artifacts:
+    name: "$CI_JOB_NAME"
     paths:
       - dist/
     expire_in: "1 days"
