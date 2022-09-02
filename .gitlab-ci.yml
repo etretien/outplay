@@ -10,7 +10,7 @@ build:
   script:
     - cd client
     - npm ci
-    - npm build
+    - npm run build
   artifacts:
     paths:
       - dist/
