@@ -14,5 +14,5 @@ build:
   artifacts:
     name: "$CI_JOB_NAME"
     paths:
-      - dist
+      - dist/*
     expire_in: "1 days"
