@@ -1,13 +1,18 @@
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 import $api from '../../../../api';
 
 import { setPopup } from '../../../../stores/popup';
 
+import Input from '../../../../components/Input/Input';
+import Button from '../../../../components/Button/Button';
+
+import styles from './Activate.module.scss';
+import authStyles from '../../Auth.module.scss';
+
 const Activate = (props: { onActivate: (() => void) | undefined }) => {
-  const location = useLocation();
-  useEffect(() => {
+  const [value, setValue] = useState<string>('');
+  /*useEffect(() => {
     if (!location.search.length) {
       setPopup({
         title: 'Activation error',
@@ -33,9 +38,45 @@ const Activate = (props: { onActivate: (() => void) | undefined }) => {
     }
     console.log(location.search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []);*/
 
-  return null;
+  const handleValueChange = (newValue: string) => setValue(newValue);
+
+  const handleActivate = () => {
+    if (!value.length) {
+      setPopup({
+        title: 'Activation error',
+        message: 'Activation link is missing',
+        details: [],
+      });
+    } else {
+      $api
+        .post('/auth/activate', { link: value })
+        .then(() => {
+          if (props.onActivate) props.onActivate();
+        })
+        .catch(() => {
+          setPopup({
+            title: 'API error',
+            message: 'Activation link is not valid',
+            details: [],
+          });
+        });
+    }
+  };
+
+  return (
+    <div className={authStyles.authContainer}>
+      <Input
+        id='activate'
+        label='Activation code'
+        value={value}
+        type='text'
+        onChange={handleValueChange}
+      />
+      <Button text='Activate' onClick={handleActivate} size='l' />
+    </div>
+  );
 };
 
 export default Activate;

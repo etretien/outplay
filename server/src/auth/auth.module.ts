@@ -5,10 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { EncryptionService } from '../core/encryption/encryption';
-import { MailingService } from "../core/mailing/mailing";
+import { MailingService } from '../core/mailing/mailing';
 
 import { AccessTokenStrategy } from '../core/strategies/access-token.strategy';
-import { RefreshTokenStrategy } from '../core/strategies/refresh-token.strategy';
 
 import UserEntity from '../user/user.entity';
 
@@ -20,7 +19,6 @@ import UserEntity from '../user/user.entity';
     EncryptionService,
     MailingService,
     AccessTokenStrategy,
-    RefreshTokenStrategy,
   ],
 })
 export class AuthModule {}

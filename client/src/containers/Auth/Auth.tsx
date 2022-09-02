@@ -1,5 +1,5 @@
-import { useLocation, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useStore } from '@nanostores/react';
 import cn from 'classnames';
 
 import $api from '../../api/index';
@@ -12,21 +12,21 @@ import ForgotPassword from './components/ForgotPassword/ForgotPassword';
 import Activate from './components/Activate/Activate';
 
 import { setPopup } from '../../stores/popup';
+import { route as routeStore, setRoute } from '../../stores/route';
+import { setAccessToken } from '../../stores/accessToken';
+import { setProfile } from '../../stores/profile';
+
+import { REFRESH_TOKEN_NAME, USER_EMAIL_NAME } from '../../helpers/consts';
 
 import styles from './Auth.module.scss';
 
-type TProps = {
-  onLogin?: (token: string) => void;
-  onActivate?: () => void;
-};
-
-const Auth = (props: TProps) => {
-  const location = useLocation();
+const Auth = () => {
+  const route = useStore(routeStore);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     setIsLoading(false);
-  }, [location]);
+  }, [route]);
 
   const handleReactivateAccount = () => {};
 
@@ -34,26 +34,36 @@ const Auth = (props: TProps) => {
     setIsLoading(true);
     $api
       .post('/auth/login', { email, password })
+      .then((response) => {
+        localStorage.setItem(REFRESH_TOKEN_NAME, response.data.refreshToken);
+        localStorage.setItem(USER_EMAIL_NAME, email);
+        setAccessToken(response.data.accessToken);
+        setRoute({ event: null, link: 'profile' });
+        setProfile({ profile: response.data.user, isLoaded: true });
+      })
       .catch((e) => {
         //TODO reactivation link
         if (e.statusCode === 403) {
+          const description =
+            e.message === 'Account is not active'
+              ? [
+                  e.message,
+                  <Button
+                    key='reactivate'
+                    text='Send activation link'
+                    size='s'
+                    onClick={handleReactivateAccount}
+                  />,
+                ]
+              : [e.message];
           setPopup({
             title: 'API Error',
             message: 'Request failed with status code 403',
-            description: [
-              'Account is not active',
-              <Button
-                key='reactivate'
-                text='Send activation link'
-                size='s'
-                onClick={handleReactivateAccount}
-              />,
-            ],
+            description,
           });
         }
       })
       .finally(() => setIsLoading(false));
-    //props.onLogin(String(Math.random()));
   };
 
   const handleForgotPassword = (email: string) => {};
@@ -69,30 +79,35 @@ const Auth = (props: TProps) => {
     await $api.post('/auth/register', data).catch(() => setIsLoading(false));
     setPopup({
       title: 'You were successfully registered',
-      message: 'Activation link was send to your email',
+      message: 'Activation code was send to your email',
       details: [],
       from: 'signup',
     });
   };
 
+  const handleActivate = () => {
+    setRoute({ event: null, link: 'sign-in' });
+  };
+
   const renderActions = () => {
     return (
       <div className={cn(styles.actions)}>
-        <Link to='/forgot-password'>Forgot password</Link>
-        <Link to='/sign-up'>Sign up</Link>
+        <button onClick={(e) => setRoute({ event: e, link: 'forgot-password' })}>
+          Forgot password
+        </button>
+        <button onClick={(e) => setRoute({ event: e, link: 'activate' })}>Activate</button>
+        <button onClick={(e) => setRoute({ event: e, link: 'sign-up' })}>Sign up</button>
       </div>
     );
   };
 
   return (
     <div className={styles.auth}>
-      {location.pathname === '/sign-in' && <SignIn isLoading={isLoading} onSingIn={handleSignIn} />}
-      {location.pathname === '/sign-up' && <SignUp onSingUp={handleSignUp} isLoading={isLoading} />}
-      {location.pathname === '/forgot-password' && (
-        <ForgotPassword onForgotPassword={handleForgotPassword} />
-      )}
-      {location.pathname.indexOf('/activate') !== -1 && <Activate onActivate={props.onActivate} />}
-      {location.pathname === '/sign-in' && renderActions()}
+      {route === 'sign-in' && <SignIn isLoading={isLoading} onSingIn={handleSignIn} />}
+      {route === 'sign-up' && <SignUp onSingUp={handleSignUp} isLoading={isLoading} />}
+      {route === 'forgot-password' && <ForgotPassword onForgotPassword={handleForgotPassword} />}
+      {route === 'activate' && <Activate onActivate={handleActivate} />}
+      {route === 'sign-in' && renderActions()}
     </div>
   );
 };

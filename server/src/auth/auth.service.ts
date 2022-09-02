@@ -14,6 +14,17 @@ export class AuthService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
+  private readonly commonFields: (keyof UserEntity)[] = [
+    'id',
+    'balance',
+    'about',
+    'firstName',
+    'lastName',
+    'gameLevel',
+    'rating',
+    'countryCode',
+  ];
+
   async createUser(data: AuthDto & { activationLink: string }) {
     const userExists = await this.userRepository.findOneBy({
       email: data.email,
@@ -35,7 +46,39 @@ export class AuthService {
       where: {
         email,
       },
-      select: ['id', 'email', 'password', 'status'],
+      select: [
+        'id',
+        'email',
+        'password',
+        'status',
+        'balance',
+        ...this.commonFields,
+      ],
+      relations: {
+        avatar: true,
+      },
+    });
+  }
+
+  async getUserByLink(email: string, activationLink: string) {
+    return this.userRepository.findOne({
+      where: {
+        email,
+        activationLink,
+      },
+      select: ['id', 'status'],
+    });
+  }
+
+  async getUserById(id: number) {
+    return this.userRepository.findOne({
+      where: {
+        id,
+      },
+      select: ['id', 'email', 'password', 'refreshToken', ...this.commonFields],
+      relations: {
+        avatar: true,
+      },
     });
   }
 
@@ -54,16 +97,6 @@ export class AuthService {
       return this.userRepository.save(newUser);
     }
     return undefined;
-  }
-
-  async getUserByLink(email: string, activationLink: string) {
-    return this.userRepository.findOne({
-      where: {
-        email,
-        activationLink,
-      },
-      select: ['id', 'status'],
-    });
   }
 
   async activateUser(id: number) {
@@ -85,14 +118,7 @@ export class AuthService {
 
   /*
 
-  async getUserById(id: number) {
-    return this.userRepository.findOne({
-      where: {
-        id,
-      },
-      select: ['id', 'login', 'password', 'refreshToken'],
-    });
-  }
+
 
 
 

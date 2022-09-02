@@ -3,19 +3,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import UserEntity from './user/user.entity';
-import AvatarEntity from "./avatar/avatar.entity";
+import AvatarEntity from './avatar/avatar.entity';
 
 /*import PermissionEntity from './permission/permission.entity';
 import GroupEntity from './group/group.entity';
 
 import { PermissionModule } from './permission/permission.module';
 import { GroupModule } from './group/group.module';
-import { UserModule } from './user/user.module';
 */
+
+import { UserModule } from './user/user.module';
 
 import { AuthModule } from './auth/auth.module';
 import { Encryption } from './core/encryption/encryption';
-import { Mailing } from "./core/mailing/mailing";
+import { Mailing } from './core/mailing/mailing';
 
 @Module({
   imports: [
@@ -36,9 +37,9 @@ import { Mailing } from "./core/mailing/mailing";
     Encryption,
     Mailing,
     AuthModule,
-   /* PermissionModule,
-    GroupModule,
     UserModule,
+    /* PermissionModule,
+    GroupModule,
     ,*/
   ],
 })

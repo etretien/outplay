@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import Button from '../../../../components/Button/Button';
 import Input from '../../../../components/Input/Input';
@@ -7,14 +6,15 @@ import FormWrapper from '../../../../components/FormWrapper/FormWrapper';
 
 import { isValidEmail } from '../../../../helpers/validation';
 
+import { setRoute } from '../../../../stores/route';
+
 import styles from '../../Auth.module.scss';
 import appStyles from '../../../../App.module.scss';
 
 const ForgotPassword = (props: { onForgotPassword: (pass: string) => void }) => {
-  const navigate = useNavigate();
   const [email, setEmail] = useState<{ value: string; error: string }>({ value: '', error: '' });
 
-  const handleBack = () => navigate(-1);
+  const handleBack = () => setRoute({ event: null, link: 'sign-in' });
 
   const handleEmailChange = (value: string) => setEmail({ value, error: '' });
 

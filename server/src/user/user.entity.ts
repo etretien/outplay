@@ -1,6 +1,15 @@
-import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+  Relation,
+} from 'typeorm';
 
 import { STATUS } from './user.dto';
+
+import AvatarEntity from '../avatar/avatar.entity';
 
 @Entity('user')
 class UserEntity {
@@ -69,7 +78,7 @@ class UserEntity {
   countryCode: string;
 
   @Column({
-    length: 100,
+    length: 300,
     select: false,
     nullable: true,
   })
@@ -82,11 +91,9 @@ class UserEntity {
   })
   activationLink: string;
 
-  @PrimaryColumn({ type: 'int', default: 0 })
-  teamId: number;
-
-  @PrimaryColumn({ type: 'int', default: 0 })
-  avatarId: number;
+  @OneToOne(() => AvatarEntity, (avatar) => avatar.user)
+  @JoinColumn()
+  avatar: Relation<AvatarEntity>;
 }
 
 export default UserEntity;

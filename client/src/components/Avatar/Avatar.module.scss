@@ -11,16 +11,62 @@
   justify-content: center;
   position: relative;
 
-  img {
+  .avatarImage {
     width: 65%;
   }
+
+  .userAvatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: 50% 50%;
+  }
+}
+
+.avatarClickable {
+  cursor: pointer;
 }
 
 .flag {
   width: 100px;
   height: 70px;
-  background-color: red;
   position: absolute;
   bottom: -33px;
   right: -30px
+}
+
+.upload {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: $main-gray;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  p {
+    font-weight: 700;
+    font-size: 40px;
+  }
+
+  .uploadInput label {
+    display: block;
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 32px;
+
+    button {
+      width: 45%;
+    }
+  }
 }

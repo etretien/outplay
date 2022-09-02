@@ -4,6 +4,8 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,6 +17,10 @@ import { MailingService } from '../core/mailing/mailing';
 import { AuthDto, RegisterDTO } from './auth.dto';
 import { STATUS } from '../user/user.dto';
 
+import { generateActivationLetter } from '../core/helpers/mailing';
+
+import { AccessTokenGuard } from '../core/guards/access-token.guard';
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -24,35 +30,23 @@ export class AuthController {
     private mailService: MailingService,
   ) {}
 
-  private async generateTokens(sub: number, login: string) {
+  private async generateTokens(sub: number, email: string) {
     const accessToken = await this.jwtService.signAsync(
       {
         sub,
-        login,
+        email,
       },
-      { secret: process.env.JWT_ACCESS_SECRET, expiresIn: 60 * 15 },
+      { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '5m' },
     );
     const refreshToken = await this.jwtService.signAsync(
       {
         sub,
-        login,
+        email,
       },
-      { secret: process.env.JWT_REFRESH_SECRET, expiresIn: 60 * 60 * 24 * 7 },
+      { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '15m' },
     );
 
     return { accessToken, refreshToken };
-  }
-
-  private generateActivationLetter(link) {
-    return {
-      html:
-        "<h1>Hello!</h1><p>Please, click the link below to activate your account.</p><a href='" +
-        link +
-        "'>ACTIVATE</a>",
-      text:
-        'Hello! Please, copy and past the following ling into you browser to activate your account:\n' +
-        link,
-    };
   }
 
   @Post('register')
@@ -79,7 +73,7 @@ export class AuthController {
       );
 
     try {
-      const { html, text } = this.generateActivationLetter(activationLink);
+      const { html, text } = generateActivationLetter(activationLink);
       const message = await this.mailService.sendEmail(
         data.email,
         'Outplay: activation letter',
@@ -111,25 +105,27 @@ export class AuthController {
     if (user.status === STATUS.DELETED)
       throw new HttpException('Account is deleted', HttpStatus.FORBIDDEN);
 
-    const tokens = await this.generateTokens(user.id, user.email);
-    const refreshHash = await this.encryptionService.hashData(
-      tokens.refreshToken,
+    const { refreshToken, accessToken } = await this.generateTokens(
+      user.id,
+      user.email,
     );
-    const accessHash = await this.encryptionService.hashData(
-      tokens.accessToken,
-    );
-    await this.authService.updateRefreshToken(user.id, refreshHash);
+    await this.authService.updateRefreshToken(user.id, refreshToken);
+    delete user.password;
     return {
-      id: user.id,
-      email: user.email,
-      refreshToken: refreshHash,
-      accessToken: accessHash,
+      user,
+      accessToken,
+      refreshToken,
     };
   }
 
   @Post('activate')
   async activate(@Body() data: { link: string }) {
     const decoded = this.jwtService.decode(data.link);
+    if (!decoded || !(decoded as { [field: string]: string }).email)
+      throw new HttpException(
+        'Activation link is not valid',
+        HttpStatus.BAD_REQUEST,
+      );
     const user = await this.authService.getUserByLink(
       (decoded as { [field: string]: string }).email,
       data.link,
@@ -146,12 +142,51 @@ export class AuthController {
       );
     if (user.status === STATUS.DELETED)
       throw new HttpException(
-        'Cannot activate account. User is deleted',
+        'Cannot activate account. Account is deleted',
         HttpStatus.BAD_REQUEST,
       );
 
     const success = await this.authService.activateUser(user.id);
     return { success };
+  }
+
+  @Post('refresh')
+  async refreshToken(@Body() data: { refreshToken: string; userHash: string }) {
+    const decoded = this.jwtService.decode(data.refreshToken);
+    if (!decoded || !(decoded as { [field: string]: string }).email)
+      throw new HttpException(
+        'Forbidden. Could not refresh token',
+        HttpStatus.FORBIDDEN,
+      );
+
+    const userFromDb = await this.authService.getUserById(decoded.sub);
+    if (!userFromDb || userFromDb.refreshToken !== data.refreshToken)
+      throw new HttpException(
+        'Forbidden. Could not refresh token',
+        HttpStatus.FORBIDDEN,
+      );
+
+    const emailsEqual = await this.encryptionService.compare(
+      userFromDb.email.split('@')[0],
+      data.userHash,
+    );
+    if (!emailsEqual)
+      throw new HttpException(
+        'Forbidden. Could not refresh token',
+        HttpStatus.FORBIDDEN,
+      );
+
+    const tokens = await this.generateTokens(userFromDb.id, userFromDb.email);
+    await this.authService.updateRefreshToken(
+      userFromDb.id,
+      tokens.refreshToken,
+    );
+    delete userFromDb.refreshToken;
+    delete userFromDb.password;
+    return {
+      user: userFromDb,
+      ...tokens,
+    };
   }
 
   /*@UseGuards(AccessTokenGuard)
@@ -164,35 +199,6 @@ export class AuthController {
     return { success: true };
   }
 
-  @UseGuards(RefreshTokenGuard)
-  @Post('refresh')
-  async refreshToken(
-    @Req() req: Request & { user: { sub: number; refreshToken: string } },
-  ) {
-    const { user } = req;
-    const userFromDb = await this.authService.getUserById(user.sub);
-    if (!userFromDb)
-      throw new HttpException('Not authorized', HttpStatus.UNAUTHORIZED);
 
-    const isValidToken = await this.encryptionService.compare(
-      user.refreshToken,
-      userFromDb.refreshToken,
-    );
-    if (!isValidToken)
-      throw new HttpException('Not authorized', HttpStatus.UNAUTHORIZED);
-
-    const tokens = await this.generateTokens(userFromDb.id, userFromDb.email);
-    const refreshHash = await this.encryptionService.hashData(
-      tokens.refreshToken,
-    );
-    const accessHash = await this.encryptionService.hashData(
-        tokens.accessToken,
-    );
-    await this.authService.updateRefreshToken(user.sub, refreshHash);
-    return {
-      id: userFromDb.id,
-      email: userFromDb.login,
-      ...tokens,
-    };
   }*/
 }

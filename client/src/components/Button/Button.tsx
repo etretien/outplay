@@ -8,11 +8,20 @@ type TProps = {
   text: string;
   className?: string;
   type?: 'submit' | 'button';
+  disabled?: boolean;
   onClick: () => void;
 };
 
 const Button = (props: TProps) => {
-  const { size = 's', color = 'blue', text, className, type = 'button', onClick } = props;
+  const {
+    size = 's',
+    color = 'blue',
+    text,
+    className,
+    type = 'button',
+    disabled = false,
+    onClick,
+  } = props;
 
   const handleClick = () => onClick();
 
@@ -20,6 +29,7 @@ const Button = (props: TProps) => {
     <button
       type={type}
       className={cn(styles.button, styles[size], styles[color], className)}
+      disabled={disabled}
       onClick={handleClick}
     >
       {text}

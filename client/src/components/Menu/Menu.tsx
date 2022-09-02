@@ -1,8 +1,7 @@
 import cn from 'classnames';
 
-import { Link } from 'react-router-dom';
-
 import styles from './Menu.module.scss';
+import { setRoute } from '../../stores/route';
 
 type TProps = {
   items: { text: string; to: string; isActive: boolean }[];
@@ -17,7 +16,7 @@ const Menu = (props: TProps) => {
             key={item.to}
             className={cn(styles.listItem, { [styles.listItemActive]: item.isActive })}
           >
-            <Link to={item.to}>{item.text}</Link>
+            <button onClick={(e) => setRoute({ event: e, link: item.to })}>{item.text}</button>
           </li>
         ))}
       </ul>

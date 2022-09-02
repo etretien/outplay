@@ -1,6 +1,10 @@
 import axios from 'axios';
 
 import { setPopup } from '../stores/popup';
+import { getAccessToken, setAccessToken } from '../stores/accessToken';
+
+import { REFRESH_TOKEN_NAME, USER_EMAIL_NAME } from '../helpers/consts';
+import { hashEmail } from '../helpers/hash';
 
 const $api = axios.create({
   baseURL: `${import.meta.env.VITE_APP_SERVER_HOST}`,
@@ -9,7 +13,7 @@ const $api = axios.create({
 $api.interceptors.request.use(
   (config) => {
     if (config.headers) {
-      config.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
+      config.headers.Authorization = `Bearer ${getAccessToken()}`;
     }
     return config;
   },
@@ -26,10 +30,16 @@ $api.interceptors.response.use(
     const originalRequest = error.config;
     if (error.response.status === 401) {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_SERVER_HOST}/api/refresh`, {
-          withCredentials: true,
+        if (!localStorage.getItem(USER_EMAIL_NAME) || !localStorage.getItem(REFRESH_TOKEN_NAME))
+          return Promise.reject(error.response.data);
+
+        const userHash = await hashEmail(localStorage.getItem(USER_EMAIL_NAME) as string);
+        const response = await axios.post(`${process.env.REACT_APP_SERVER_HOST}/auth/refresh`, {
+          refreshToken: localStorage.getItem(REFRESH_TOKEN_NAME),
+          userHash,
         });
-        localStorage.setItem('token', response.data.accessToken);
+        localStorage.setItem(REFRESH_TOKEN_NAME, response.data.refreshToken);
+        setAccessToken(response.data.accessToken);
         return $api.request(originalRequest);
       } catch (e) {
         return Promise.reject(error.response.data);

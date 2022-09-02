@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useStore } from '@nanostores/react';
 
 import Input from '../../../../components/Input/Input';
@@ -9,6 +8,7 @@ import Select from '../../../../components/Select/Select';
 import { isValidEmail } from '../../../../helpers/validation';
 
 import { countries as countriesStore } from '../../../../stores/countries';
+import { setRoute } from '../../../../stores/route';
 
 import styles from '../../Auth.module.scss';
 import appStyles from '../../../../App.module.scss';
@@ -62,7 +62,6 @@ const setError = (field: string): string => {
 };
 
 const SignUp = (props: TProps) => {
-  const navigate = useNavigate();
   const countries = useStore(countriesStore);
 
   const [form, setForm] = useState<{ [field: string]: { value: string; error: string } }>(
@@ -116,7 +115,7 @@ const SignUp = (props: TProps) => {
     props.onSingUp(form);
   };
 
-  const handleBack = () => navigate(-1);
+  const handleBack = () => setRoute({ event: null, link: 'sign-in' });
 
   return (
     <>

@@ -13,15 +13,20 @@
   width: 70%;
   margin: 16px auto 0;
 
-  a {
+  button {
     font-size: 16px;
     height: auto;
     padding: 0;
     transition: color 200ms;
-    text-decoration: none;
+    border: unset;
+    outline: none;
+    background-color: transparent;
+    cursor: pointer;
+    width: 62px;
+    white-space: nowrap;
   }
 
-  a:first-of-type {
+  button:not(:last-of-type) {
     color: $gray-600;
 
     &:hover {
@@ -29,7 +34,7 @@
     }
   }
 
-  a:last-of-type {
+  button:last-of-type {
     color: $blue-500;
 
     &:hover {

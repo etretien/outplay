@@ -1,5 +1,4 @@
 import { useMemo, useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import { useStore } from '@nanostores/react';
 import cn from 'classnames';
 
@@ -10,11 +9,12 @@ import Avatar from '../../components/Avatar/Avatar';
 import Menu from '../../components/Menu/Menu';
 
 import { users as usersStore, getUsers } from '../../stores/users';
+import { setRoute } from '../../stores/route';
 
 import appStyles from '../../App.module.scss';
 import styles from './Players.module.scss';
 
-import { innerMenu } from '../../helpers/consts';
+import { INNER_MENU } from '../../helpers/consts';
 
 import { TUser } from '../../types/app-types';
 
@@ -34,7 +34,6 @@ const UsersSkeleton = () => {
 };
 
 const Players = () => {
-  const navigate = useNavigate();
   const { list: users, isLoaded: isLoadedUsers } = useStore(usersStore);
 
   const [filter1Option, setFilter1Option] = useState<{
@@ -48,9 +47,9 @@ const Players = () => {
 
   const menuItems = useMemo(
     () =>
-      innerMenu.map((item) => ({
+      INNER_MENU.map((item) => ({
         ...item,
-        isActive: item.to === '/players',
+        isActive: item.to === 'players',
       })),
     [],
   );
@@ -59,7 +58,7 @@ const Players = () => {
     getUsers().catch((e) => console.log('Getting users error: ', e));
   }, []);
 
-  const handleBack = () => navigate('/profile');
+  const handleBack = () => setRoute({ event: null, link: 'profile' });
 
   const handleFilter1Change = (option: { value: string | number; text: string }) => {
     setFilter1Option(option);
@@ -108,12 +107,16 @@ const Players = () => {
         <div className={styles.list}>
           {isLoadedUsers ? (
             users.map((user: TUser) => (
-              <Link className={styles.player} to={user.id.toString()} key={user.id}>
+              <button
+                className={styles.player}
+                onClick={(e) => setRoute({ event: e, link: `players/${user.id}` })}
+                key={user.id}
+              >
                 <div className={styles.avatar}>
                   <Avatar />
                 </div>
                 <div className={styles.info}></div>
-              </Link>
+              </button>
             ))
           ) : (
             <UsersSkeleton />

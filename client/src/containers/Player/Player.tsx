@@ -1,29 +1,30 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { useStore } from '@nanostores/react';
 import cn from 'classnames';
 
 import { users as usersStore, getUsers } from '../../stores/users';
+import { route as routeStore } from '../../stores/route';
 
 import Profile from '../Profile/Profile';
+import Logo from '../../components/Logo/Logo';
 
 import styles from './Player.module.scss';
 
 import { TUser } from '../../types/app-types';
-import Logo from '../../components/Logo/Logo';
 
 const Player = () => {
-  const params = useParams();
+  const route = useStore(routeStore);
   const { list: users, isLoaded: isLoadedUsers } = useStore(usersStore);
+
   const [currentUser, setCurrentUser] = useState<TUser | undefined>(
-    users.find(({ id }) => id === Number(params.id)),
+    users.find(({ id }) => id === Number(route.split('/')[1])),
   );
 
   useEffect(() => {
     if (!currentUser && !isLoadedUsers) {
       getUsers()
         .then((result) => {
-          setCurrentUser(result.list.find(({ id }) => id === Number(params.id)));
+          setCurrentUser(result.list.find(({ id }) => id === Number(route.split('/')[1])));
         })
         .catch((e) => console.log('Getting users error: ', e));
     }

@@ -2,8 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 
-/*import { NotFoundInterceptor } from './core/interceptors/NotFoundInterceptor/NotFoundInterceptor';
-import { LoggingInterceptor } from './core/interceptors/LoggerInterceptor/LoggerInterceptor';*/
+import { NotFoundInterceptor } from './core/interceptors/NotFoundInterceptor/NotFoundInterceptor';
+/*import { LoggingInterceptor } from './core/interceptors/LoggerInterceptor/LoggerInterceptor';*/
 
 import { AppModule } from './app.module';
 
@@ -17,7 +17,7 @@ const start = async () => {
   app.enableCors();
   app.setGlobalPrefix('api/v1');
   //app.useGlobalInterceptors(new LoggingInterceptor());
-  //app.useGlobalInterceptors(new NotFoundInterceptor());
+  app.useGlobalInterceptors(new NotFoundInterceptor());
   app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(port, () => console.log(`Server started on port: ${port}`));
