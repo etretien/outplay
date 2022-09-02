@@ -11,8 +11,9 @@ build:
     - cd client
     - npm ci
     - npm run build
+    - tar -cvf artifacts.tar.gz dist/
   artifacts:
     name: "$CI_JOB_NAME"
     paths:
-      - dist/*
+      - artifacts.tar.gz
     expire_in: "1 days"
