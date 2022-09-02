@@ -17,5 +17,5 @@ build:
     name: "$CI_JOB_NAME"
     paths:
       #  - artifacts.tar.gz
-      - ./dist/
+      - client/dist/
     expire_in: "1 days"
