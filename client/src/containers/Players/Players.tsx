@@ -9,6 +9,7 @@ import Avatar from '../../components/Avatar/Avatar';
 import Menu from '../../components/Menu/Menu';
 
 import { users as usersStore, getUsers } from '../../stores/users';
+import { countries as countriesStore } from '../../stores/countries';
 import { setRoute } from '../../stores/route';
 
 import appStyles from '../../App.module.scss';
@@ -35,6 +36,7 @@ const UsersSkeleton = () => {
 
 const Players = () => {
   const { list: users, isLoaded: isLoadedUsers } = useStore(usersStore);
+  const countries = useStore(countriesStore);
 
   const [filter1Option, setFilter1Option] = useState<{
     value: string | number;
@@ -113,9 +115,15 @@ const Players = () => {
                 key={user.id}
               >
                 <div className={styles.avatar}>
-                  <Avatar />
+                  <Avatar
+                    countryCode={user.countryCode}
+                    countryName={countries[user.countryCode]}
+                    avatar={user.avatar}
+                  />
                 </div>
-                <div className={styles.info}></div>
+                <div className={styles.info}>
+                  <p>{`${user.firstName} ${user.lastName}`}</p>
+                </div>
               </button>
             ))
           ) : (

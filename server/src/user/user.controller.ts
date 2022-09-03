@@ -95,6 +95,22 @@ export class UserController {
     return updatedUser || undefined;
   }
 
+  @UseGuards(AccessTokenGuard)
+  @Get()
+  async getUsers(@Query() query: Record<string, string>) {
+    const limit = query.limit ? +query.limit : 10;
+    const offset = query.offset ? +query.offset : 0;
+    const { users, total } = await this.userService.getUsers(limit, offset);
+    return {
+      users,
+      pagination: {
+        limit,
+        offset,
+        total,
+      },
+    };
+  }
+
   /*
 
     @UseGuards(AccessTokenGuard)
@@ -111,25 +127,5 @@ export class UserController {
         return result || undefined;
     }
 
-    @UseGuards(AccessTokenGuard)
-    @Get()
-    async getUsers(@Query() query: Record<string, string>) {
-        const limit = query.limit ? +query.limit : 10;
-        const offset = query.offset ? +query.offset : 0;
-        const login = query.login?.toLowerCase() || '';
-        const { data, meta, total } = await this.userService.getUsers(
-            login,
-            limit,
-            offset,
-        );
-        return {
-            users: data,
-            meta,
-            pagination: {
-                limit,
-                offset,
-                total,
-            },
-        };
-    }*/
+    */
 }

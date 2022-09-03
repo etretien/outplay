@@ -6,7 +6,7 @@ import UserEntity from './user.entity';
 import AvatarEntity from '../avatar/avatar.entity';
 
 import { TYPE } from '../avatar/avatar.dto';
-import { UserPatchDto, UserPostDto } from './user.dto';
+import { STATUS, UserPatchDto, UserPostDto } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -44,7 +44,7 @@ export class UserService {
       return undefined;
     }
 
-    const sameVisitor = await this.userRepository.findOne({
+    /*const sameVisitor = await this.userRepository.findOne({
       where: { visitorId: data.visitorId },
       select: ['visitorId', 'registrationTime'],
     });
@@ -52,7 +52,7 @@ export class UserService {
       const diff =
         (performance.now() - Number(sameVisitor.registrationTime)) / 3600000;
       if (diff < 1) return { error: true };
-    }
+    }*/
 
     const user = new UserEntity();
     const newUser = {
@@ -79,60 +79,24 @@ export class UserService {
     return undefined;
   }
 
-  /*private async toJson(user: UserEntity | UserEntity[]) {
-        const groups = await this.groupRepository.find({
-            relations: ['permissions', 'users'],
-        });
-        let data;
-        if (Array.isArray(user)) {
-            data = user.map((item) => ({
-                ...item,
-                groups: item.groups.map((group) => group.id),
-            }));
-        } else {
-            data = {
-                ...user,
-                groups: user.groups.map((group) => group.id),
-            };
-        }
-        return {
-            data,
-            meta: {
-                groups: groups.map((group) => ({
-                    name: group.name,
-                    id: group.id,
-                })),
-            },
-        };
-    }
+  async getUsers(limit: number, offset: number) {
+    const [users, total] = await this.userRepository.findAndCount({
+      order: {
+        rating: 'ASC',
+      },
+      where: {
+        status: STATUS.ACTIVE,
+      },
+      skip: offset,
+      take: limit,
+      relations: {
+        avatar: true,
+      },
+    });
+    return { users, total };
+  }
 
-    async createUser(data: UserPostDto) {
-        const userExists = await this.userRepository.findOneBy({
-            login: data.login,
-        });
-        if (userExists) {
-            return undefined;
-        }
-
-        const groups = await this.groupRepository.find({
-            where: {
-                id: In(data.groupsIds),
-            },
-        });
-        const user = new UserEntity();
-        const newUser = {
-            ...user,
-            ...data,
-            groups,
-        };
-        await this.userRepository.save(newUser);
-        delete newUser.deletedAt;
-        delete newUser.password;
-        delete newUser.refreshToken;
-        return this.toJson(newUser);
-    }
-
-
+  /*
 
     async softDeleteUser(id: number) {
         const userToDelete = await this.userRepository.findOneBy({
@@ -155,19 +119,5 @@ export class UserService {
         return user ? this.toJson(user) : undefined;
     }
 
-    async getUsers(login: string, limit: number, offset: number) {
-        const [users, total] = await this.userRepository.findAndCount({
-            order: {
-                login: 'ASC',
-            },
-            skip: offset,
-            take: limit,
-            where: {
-                login: ILike(`${login}%`),
-            },
-            relations: ['groups'],
-        });
-        const json = await this.toJson(users);
-        return { ...json, total };
-    }*/
+    */
 }
