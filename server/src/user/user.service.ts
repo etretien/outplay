@@ -82,7 +82,7 @@ export class UserService {
   async getUsers(limit: number, offset: number) {
     const [users, total] = await this.userRepository.findAndCount({
       order: {
-        rating: 'ASC',
+        rating: 'DESC',
       },
       where: {
         status: STATUS.ACTIVE,
