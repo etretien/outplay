@@ -25,22 +25,6 @@ export class AuthService {
     'countryCode',
   ];
 
-  async createUser(data: AuthDto & { activationLink: string }) {
-    const userExists = await this.userRepository.findOneBy({
-      email: data.email,
-    });
-    if (userExists) {
-      return undefined;
-    }
-
-    const user = new UserEntity();
-    const newUser = {
-      ...user,
-      ...data,
-    };
-    return this.userRepository.save(newUser);
-  }
-
   async getUserByEmail(email: string) {
     return this.userRepository.findOne({
       where: {
@@ -116,12 +100,6 @@ export class AuthService {
     return false;
   }
 
-  /*
-
-
-
-
-
   async destroyToken(id: number) {
     const userToUpdate = await this.userRepository.findOne({
       where: {
@@ -136,5 +114,5 @@ export class AuthService {
       return this.userRepository.save(newUser);
     }
     return undefined;
-  }*/
+  }
 }

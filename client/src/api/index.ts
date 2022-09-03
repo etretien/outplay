@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { setPopup } from '../stores/popup';
+import { getRoute, setRoute } from '../stores/route';
 import { getAccessToken, setAccessToken } from '../stores/accessToken';
 
 import { REFRESH_TOKEN_NAME, USER_EMAIL_NAME } from '../helpers/consts';
@@ -34,7 +35,7 @@ $api.interceptors.response.use(
           return Promise.reject(error.response.data);
 
         const userHash = await hashEmail(localStorage.getItem(USER_EMAIL_NAME) as string);
-        const response = await axios.post(`${process.env.REACT_APP_SERVER_HOST}/auth/refresh`, {
+        const response = await $api.post('/auth/refresh', {
           refreshToken: localStorage.getItem(REFRESH_TOKEN_NAME),
           userHash,
         });
@@ -42,17 +43,26 @@ $api.interceptors.response.use(
         setAccessToken(response.data.accessToken);
         return $api.request(originalRequest);
       } catch (e) {
+        setPopup({
+          title: 'Session expired',
+          message: 'Your session has expired. Please, login again',
+          description: [],
+          from: 'expired',
+        });
         return Promise.reject(error.response.data);
       }
-    } else {
-      const message = JSON.parse(error.request.responseText).message;
+    }
+
+    const message = JSON.parse(error.request.responseText).message;
+    const isException = error.config.url.indexOf('auth/refresh') !== -1;
+    if (!isException) {
       setPopup({
         title: 'API Error',
         message: error.message,
         description: Array.isArray(message) ? message : [message],
       });
-      return Promise.reject(error.response.data);
     }
+    return Promise.reject(error.response.data);
   },
 );
 

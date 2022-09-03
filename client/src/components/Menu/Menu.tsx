@@ -4,7 +4,7 @@ import styles from './Menu.module.scss';
 import { setRoute } from '../../stores/route';
 
 type TProps = {
-  items: { text: string; to: string; isActive: boolean }[];
+  items: { text: string; to: string; isActive: boolean; badge?: number | null }[];
 };
 
 const Menu = (props: TProps) => {
@@ -17,6 +17,7 @@ const Menu = (props: TProps) => {
             className={cn(styles.listItem, { [styles.listItemActive]: item.isActive })}
           >
             <button onClick={(e) => setRoute({ event: e, link: item.to })}>{item.text}</button>
+            {item.badge && <span className={styles.badge}>{item.badge}</span>}
           </li>
         ))}
       </ul>

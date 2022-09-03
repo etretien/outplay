@@ -12,11 +12,12 @@
   align-items: center;
   justify-content: space-between;
   margin: 0;
-  padding: 0 18%;
+  padding: 0;
 }
 
 .listItem {
   font-size: 24px;
+  position: relative;
 
   button {
     border: unset;
@@ -24,6 +25,27 @@
     color: $black;
     cursor: pointer;
     background-color: transparent;
+    white-space: nowrap;
+    transition: color 200ms;
+
+    &:hover {
+      color: $blue-500;
+    }
+  }
+
+  .badge {
+    position: absolute;
+    font-size: 14px;
+    background-color: $blue-500;
+    color: $white;
+    top: 0;
+    right: -20px;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 

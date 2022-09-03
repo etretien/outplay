@@ -17,6 +17,16 @@ class UserEntity {
   id: number;
 
   @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    select: false,
+  })
+  registrationTime: string;
+
+  @Column({ select: false })
+  visitorId: string;
+
+  @Column({
     length: 100,
   })
   firstName: string;

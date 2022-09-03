@@ -16,7 +16,7 @@ import { TAvatar } from '../../types/app-types';
 type TProps = {
   countryCode: string;
   countryName: string | undefined;
-  avatar: TAvatar | undefined;
+  avatar: TAvatar | null;
   canUpload?: boolean;
   onUpload?: (data: File | string, type: string) => void;
 };

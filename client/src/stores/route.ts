@@ -12,3 +12,5 @@ export const setRoute = action(
     return store.get();
   },
 );
+
+export const getRoute = action(route, 'getRoute', (store) => store.get());

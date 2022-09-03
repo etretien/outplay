@@ -32,12 +32,14 @@
 
 .info {
   margin-bottom: 8px;
+  width: 100%;
 }
 
 .infoRow {
   display: flex;
   align-items: center;
   font-size: 24px;
+  width: 100%;
 }
 
 .infoRow + .infoRow {
@@ -79,4 +81,21 @@
     right: 0;
     bottom: 10px;
   }
+}
+
+.logout {
+  position: absolute;
+  padding: 42px 30px;
+  top: 0;
+  right: 0;
+  color: #1E1E1E;
+  font-weight: 500;
+  z-index: 2;
+  height: auto;
+  display: block;
+  background: transparent;
+  border: unset;
+  outline: none;
+  font-size: 24px;
+  cursor: pointer;
 }

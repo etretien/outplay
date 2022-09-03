@@ -8,12 +8,6 @@ export const profile = atom<{ profile: TUser | null; isLoaded: boolean }>({
 });
 
 export const getProfile = action(profile, 'getProfile', async (store) => {
-  /*const response: TUser = await new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ id: 1, firstName: 'Jon', lastName: 'Snow' });
-    }, 1000);
-  });
-  store.set({ profile: response, isLoaded: true });*/
   return store.get();
 });
 

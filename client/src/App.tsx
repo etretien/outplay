@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import cn from 'classnames';
 import { useStore } from '@nanostores/react';
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 import Auth from './containers/Auth/Auth';
 import Profile from './containers/Profile/Profile';
@@ -34,6 +35,18 @@ function App() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [refreshToken] = useState<string | null>(localStorage.getItem(REFRESH_TOKEN_NAME));
   const [userEmail] = useState<string | null>(localStorage.getItem(USER_EMAIL_NAME));
+  const [visitorId, setVisitorId] = useState<string>('');
+
+  useEffect(() => {
+    const fpPromise = FingerprintJS.load();
+
+    (async () => {
+      // Get the visitor identifier when you need it.
+      const fp = await fpPromise;
+      const result = await fp.get();
+      setVisitorId(result.visitorId);
+    })();
+  }, []);
 
   useEffect(() => {
     getCountries().catch((e) => console.log('Getting countries error: ', e));
@@ -67,14 +80,9 @@ function App() {
   const handleClosePopup = () => {
     const isSignup = popup.from === 'signup';
     const activationError = popup.from === 'activation-error';
+    const expired = popup.from === 'expired';
     setPopup({});
-    if (isSignup || activationError) setRoute({ event: null, link: 'sign-in' });
-  };
-
-  const handleUploadAvatar = (data: string, type: string) => {
-    $api.patch(`users/${user.profile!.id}`, { avatar: data, avatarType: type }).then((response) => {
-      setProfile({ profile: { ...user.profile, avatar: response.data }, isLoaded: true });
-    });
+    if (isSignup || activationError || expired) setRoute({ event: null, link: 'sign-in' });
   };
 
   const renderComponent = () => {
@@ -84,9 +92,9 @@ function App() {
       case 'sign-up':
       case 'forgot-password':
       case 'activate':
-        return <Auth />;
+        return <Auth visitorId={visitorId} />;
       case 'profile':
-        return <Profile onUploadAvatar={handleUploadAvatar} />;
+        return <Profile />;
       case 'players':
         return <Players />;
       default:

@@ -1,0 +1,56 @@
+@import "../../common-styles/variables.scss";
+
+.editable {
+  display: flex;
+  align-items: flex-start;
+}
+
+.editMode {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+
+  textarea {
+    height: 200px;
+    border-radius: $border-radius;
+    outline: none;
+    border: unset;
+    padding: 22px 16px 21px;
+    resize: none;
+    width: 100%;
+  }
+
+  .actions {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+.editable,
+.editMode {
+  button {
+    background-color: transparent;
+    outline: none;
+    border: unset;
+    cursor: pointer;
+    margin-right: 8px;
+  }
+}
+
+.editable button {
+  margin-top: 24px;
+}
+
+.editable button svg path {
+  fill: $gray-400;
+}
+
+.editMode button:first-of-type svg path {
+  fill: $green-500;
+}
+
+.editMode button:last-of-type svg path {
+  fill: red;
+}

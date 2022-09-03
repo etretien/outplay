@@ -20,7 +20,7 @@ import { REFRESH_TOKEN_NAME, USER_EMAIL_NAME } from '../../helpers/consts';
 
 import styles from './Auth.module.scss';
 
-const Auth = () => {
+const Auth = (props: { visitorId: string }) => {
   const route = useStore(routeStore);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -76,13 +76,17 @@ const Auth = () => {
         [key]: form[key].value.trim(),
       };
     }, {});
-    await $api.post('/auth/register', data).catch(() => setIsLoading(false));
-    setPopup({
-      title: 'You were successfully registered',
-      message: 'Activation code was send to your email',
-      details: [],
-      from: 'signup',
-    });
+    await $api
+      .post('/users', { ...data, visitorId: props.visitorId })
+      .then(() => {
+        setPopup({
+          title: 'You were successfully registered',
+          message: 'Activation code was send to your email',
+          details: [],
+          from: 'signup',
+        });
+      })
+      .catch(() => setIsLoading(false));
   };
 
   const handleActivate = () => {

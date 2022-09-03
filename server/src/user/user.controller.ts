@@ -11,52 +11,91 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
+import { JwtService } from '@nestjs/jwt';
 
 import { AccessTokenGuard } from '../core/guards/access-token.guard';
 
 import { UserService } from './user.service';
 import { EncryptionService } from '../core/encryption/encryption';
+import { MailingService } from '../core/mailing/mailing';
 
-import { UserPatchDto } from './user.dto';
+import { UserPatchDto, UserPatchAvatarDto, UserPostDto } from './user.dto';
+
+import { generateActivationLetter } from '../core/helpers/mailing';
 
 @Controller('users')
 export class UserController {
   constructor(
     private userService: UserService,
     private encryptionService: EncryptionService,
+    private jwtService: JwtService,
+    private mailingService: MailingService,
   ) {}
+
+  @Post()
+  async createUser(@Body() data: UserPostDto) {
+    const hashedPassword = await this.encryptionService.hashData(data.password);
+    const link = uuidv4();
+    const activationLink = await this.jwtService.signAsync(
+      {
+        sub: link,
+        email: data.email,
+      },
+      { secret: process.env.JWT_REFRESH_SECRET },
+    );
+
+    const user = await this.userService.createUser({
+      ...data,
+      password: hashedPassword,
+      activationLink,
+    });
+    if (!user)
+      throw new HttpException(
+        'User with such email already exists',
+        HttpStatus.BAD_REQUEST,
+      );
+    if ((user as unknown as { error: true }).error)
+      throw new HttpException(
+        'Too many attempts to create account',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    try {
+      const { html, text } = generateActivationLetter(activationLink);
+      const message = await this.mailingService.sendEmail(
+        data.email,
+        'Outplay: activation letter',
+        html,
+        text,
+      );
+      return { success: !!message.messageId, activationLink };
+    } catch (e) {
+      return { success: false, error: e, activationLink };
+    }
+  }
 
   @UseGuards(AccessTokenGuard)
   @Patch(':id')
-  async updateUser(@Param('id') id: number, @Body() data: UserPatchDto) {
-    if (data.avatar) {
-      return this.userService.updateAvatar(data.avatar, data.avatarType, id);
+  async updateUser(
+    @Param('id') id: number,
+    @Body() data: UserPatchDto | UserPatchAvatarDto,
+  ) {
+    if ((data as UserPatchAvatarDto).avatar) {
+      return this.userService.updateAvatar(
+        (data as UserPatchAvatarDto).avatar,
+        (data as UserPatchAvatarDto).avatarType,
+        id,
+      );
     }
-    /*const updatedUser = await this.userService.updateUser(id, data);
-        return updatedUser || undefined;*/
+    const updatedUser = await this.userService.updateUser(
+      id,
+      data as UserPatchDto,
+    );
+    return updatedUser || undefined;
   }
 
-  /*@UseGuards(AccessTokenGuard)
-    @Post()
-    async createUser(@Body() data: UserPostDto) {
-        const hashedPassword = await this.encryptionService.hashData(data.password);
-
-        const newUser = await this.userService.createUser({
-            ...data,
-            password: hashedPassword,
-        });
-        if (!newUser) {
-            throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
-        }
-        return newUser;
-    }
-
-    @UseGuards(AccessTokenGuard)
-    @Put(':id')
-    async updateUser(@Param('id') id: number, @Body() data: UserPutDto) {
-        const updatedUser = await this.userService.updateUser(id, data);
-        return updatedUser || undefined;
-    }
+  /*
 
     @UseGuards(AccessTokenGuard)
     @Delete(':id')

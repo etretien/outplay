@@ -8,16 +8,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { v4 as uuidv4 } from 'uuid';
 
 import { EncryptionService } from '../core/encryption/encryption';
 import { AuthService } from './auth.service';
-import { MailingService } from '../core/mailing/mailing';
 
-import { AuthDto, RegisterDTO } from './auth.dto';
+import { AuthDto } from './auth.dto';
 import { STATUS } from '../user/user.dto';
-
-import { generateActivationLetter } from '../core/helpers/mailing';
 
 import { AccessTokenGuard } from '../core/guards/access-token.guard';
 
@@ -27,7 +23,6 @@ export class AuthController {
     private authService: AuthService,
     private jwtService: JwtService,
     private encryptionService: EncryptionService,
-    private mailService: MailingService,
   ) {}
 
   private async generateTokens(sub: number, email: string) {
@@ -49,41 +44,14 @@ export class AuthController {
     return { accessToken, refreshToken };
   }
 
-  @Post('register')
-  async register(@Body() data: RegisterDTO) {
-    const hashedPassword = await this.encryptionService.hashData(data.password);
-    const link = uuidv4();
-    const activationLink = await this.jwtService.signAsync(
-      {
-        sub: link,
-        email: data.email,
-      },
-      { secret: process.env.JWT_REFRESH_SECRET },
-    );
-
-    const user = await this.authService.createUser({
-      ...data,
-      password: hashedPassword,
-      activationLink,
-    });
-    if (!user)
+  private decodeToken(token: string) {
+    const decoded = this.jwtService.decode(token);
+    if (!decoded || !(decoded as { [field: string]: string }).email)
       throw new HttpException(
-        'User with such email already exists',
-        HttpStatus.BAD_REQUEST,
+        'Forbidden. Could not refresh token',
+        HttpStatus.FORBIDDEN,
       );
-
-    try {
-      const { html, text } = generateActivationLetter(activationLink);
-      const message = await this.mailService.sendEmail(
-        data.email,
-        'Outplay: activation letter',
-        html,
-        text,
-      );
-      return { success: !!message.messageId, activationLink };
-    } catch (e) {
-      return { success: false, error: e, activationLink };
-    }
+    return decoded;
   }
 
   @Post('login')
@@ -120,12 +88,7 @@ export class AuthController {
 
   @Post('activate')
   async activate(@Body() data: { link: string }) {
-    const decoded = this.jwtService.decode(data.link);
-    if (!decoded || !(decoded as { [field: string]: string }).email)
-      throw new HttpException(
-        'Activation link is not valid',
-        HttpStatus.BAD_REQUEST,
-      );
+    const decoded = this.decodeToken(data.link);
     const user = await this.authService.getUserByLink(
       (decoded as { [field: string]: string }).email,
       data.link,
@@ -152,12 +115,7 @@ export class AuthController {
 
   @Post('refresh')
   async refreshToken(@Body() data: { refreshToken: string; userHash: string }) {
-    const decoded = this.jwtService.decode(data.refreshToken);
-    if (!decoded || !(decoded as { [field: string]: string }).email)
-      throw new HttpException(
-        'Forbidden. Could not refresh token',
-        HttpStatus.FORBIDDEN,
-      );
+    const decoded = this.decodeToken(data.refreshToken);
 
     const userFromDb = await this.authService.getUserById(decoded.sub);
     if (!userFromDb || userFromDb.refreshToken !== data.refreshToken)
@@ -176,6 +134,15 @@ export class AuthController {
         HttpStatus.FORBIDDEN,
       );
 
+    const isValidToken = await this.jwtService.verify(data.refreshToken, {
+      secret: process.env.JWT_REFRESH_SECRET,
+    });
+    if (!isValidToken)
+      throw new HttpException(
+        'Forbidden. Could not refresh token',
+        HttpStatus.FORBIDDEN,
+      );
+
     const tokens = await this.generateTokens(userFromDb.id, userFromDb.email);
     await this.authService.updateRefreshToken(
       userFromDb.id,
@@ -189,16 +156,13 @@ export class AuthController {
     };
   }
 
-  /*@UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Post('logout')
-  async logout(@Req() req: Request & { user: { sub: number } }) {
-    const { user } = req;
-    const result = await this.authService.destroyToken(user.sub);
+  async logout(@Body() data: { refreshToken: string }) {
+    const decoded = this.decodeToken(data.refreshToken);
+    const result = await this.authService.destroyToken(decoded.sub);
     if (!result)
       throw new HttpException('Not authorized', HttpStatus.UNAUTHORIZED);
     return { success: true };
   }
-
-
-  }*/
 }

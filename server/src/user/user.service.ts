@@ -6,6 +6,7 @@ import UserEntity from './user.entity';
 import AvatarEntity from '../avatar/avatar.entity';
 
 import { TYPE } from '../avatar/avatar.dto';
+import { UserPatchDto, UserPostDto } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -33,6 +34,49 @@ export class UserService {
       avatar: newAvatar,
     });
     return newAvatar;
+  }
+
+  async createUser(data: UserPostDto & { activationLink: string }) {
+    const userExists = await this.userRepository.findOneBy({
+      email: data.email,
+    });
+    if (userExists) {
+      return undefined;
+    }
+
+    const sameVisitor = await this.userRepository.findOne({
+      where: { visitorId: data.visitorId },
+      select: ['visitorId', 'registrationTime'],
+    });
+    if (sameVisitor) {
+      const diff =
+        (performance.now() - Number(sameVisitor.registrationTime)) / 3600000;
+      if (diff < 1) return { error: true };
+    }
+
+    const user = new UserEntity();
+    const newUser = {
+      ...user,
+      ...data,
+    };
+    return this.userRepository.save(newUser);
+  }
+
+  async updateUser(id: number, data: UserPatchDto) {
+    const userToUpdate = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (userToUpdate) {
+      const newUser = {
+        ...userToUpdate,
+        ...data,
+      };
+      await this.userRepository.save(newUser);
+      return { success: true };
+    }
+    return undefined;
   }
 
   /*private async toJson(user: UserEntity | UserEntity[]) {
@@ -88,33 +132,7 @@ export class UserService {
         return this.toJson(newUser);
     }
 
-    async updateUser(id: number, data: UserPutDto) {
-        const userToUpdate = await this.userRepository.findOne({
-            where: {
-                id,
-            },
-            relations: ['groups'],
-        });
-        if (userToUpdate) {
-            const groups = await this.groupRepository.find({
-                where: {
-                    id: In(data.groupsIds),
-                },
-            });
-            delete data.groupsIds;
-            const newUser = {
-                ...userToUpdate,
-                ...data,
-                groups,
-            };
-            await this.userRepository.save(newUser);
-            delete newUser.deletedAt;
-            delete newUser.password;
-            delete newUser.refreshToken;
-            return this.toJson(newUser);
-        }
-        return undefined;
-    }
+
 
     async softDeleteUser(id: number) {
         const userToDelete = await this.userRepository.findOneBy({

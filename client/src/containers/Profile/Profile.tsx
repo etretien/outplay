@@ -2,15 +2,18 @@ import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '@nanostores/react';
 import cn from 'classnames';
 
+import $api from '../../api';
+
 import Button from '../../components/Button/Button';
 import Alert from '../../components/Alert/Alert';
 import Menu from '../../components/Menu/Menu';
 import Avatar from '../../components/Avatar/Avatar';
 import Logo from '../../components/Logo/Logo';
+import EditableContent from '../../components/EditableContent/EditableContent';
 
-import { INNER_MENU } from '../../helpers/consts';
+import { INNER_MENU_PROFILE, REFRESH_TOKEN_NAME, USER_EMAIL_NAME } from '../../helpers/consts';
 
-import { profile as profileStore } from '../../stores/profile';
+import { profile as profileStore, setProfile } from '../../stores/profile';
 import { setRoute } from '../../stores/route';
 import { countries as countriesStore } from '../../stores/countries';
 
@@ -25,7 +28,6 @@ type TProps = {
   isOwner?: boolean;
   isSmall?: boolean;
   user?: TUser;
-  onUploadAvatar?: (data: string, type: string) => void;
 };
 
 const Profile = (props: TProps) => {
@@ -51,9 +53,10 @@ const Profile = (props: TProps) => {
 
   const menuItems = useMemo(
     () =>
-      INNER_MENU.map((item) => ({
+      INNER_MENU_PROFILE.map((item) => ({
         ...item,
         isActive: isOwner ? item.to === 'profile' : item.to === 'players',
+        badge: item.to === 'my-challenges' ? 5 : null,
       })),
     [isOwner],
   );
@@ -63,10 +66,35 @@ const Profile = (props: TProps) => {
   };
 
   const handleUploadAvatar = async (data: string | File, type: string) => {
-    if (props.onUploadAvatar) {
-      const img = type === 'IMAGE' ? await toBase64(data as File) : data;
-      props.onUploadAvatar(img as string, type);
-    }
+    const img = type === 'IMAGE' ? await toBase64(data as File) : data;
+    $api.patch(`users/${currentUser!.id}`, { avatar: img, avatarType: type }).then((response) => {
+      if (response) {
+        setProfile({ profile: { ...currentUser, avatar: response.data }, isLoaded: true });
+      }
+    });
+  };
+
+  const handleLogout = () => {
+    $api
+      .post('auth/logout', { refreshToken: localStorage.getItem(REFRESH_TOKEN_NAME) })
+      .then((response) => {
+        if (response) {
+          setProfile({
+            profile: null,
+            isLoaded: false,
+          });
+          setRoute({ event: null, link: 'sign-in' });
+          localStorage.setItem(REFRESH_TOKEN_NAME, '');
+          localStorage.setItem(USER_EMAIL_NAME, '');
+        }
+      });
+  };
+
+  const handleFieldChange = (value: string, field: string | undefined) => {
+    setProfile({ profile: { ...currentUser, [field as string]: value }, isLoaded: true });
+    $api
+      .patch(`users/${currentUser!.id}`, { [field as string]: value })
+      .catch((e) => console.log('Updating profile error: ', e));
   };
 
   return (
@@ -80,7 +108,7 @@ const Profile = (props: TProps) => {
           <Avatar
             countryCode={currentUser?.countryCode || ''}
             countryName={countries[currentUser?.countryCode || '']}
-            avatar={currentUser?.avatar}
+            avatar={currentUser?.avatar || null}
             canUpload={isOwner && !isSmall}
             onUpload={handleUploadAvatar}
           />
@@ -93,13 +121,25 @@ const Profile = (props: TProps) => {
                 <h1>{`${currentUser.firstName} ${currentUser.lastName}`}</h1>
                 <div className={currentStyles.info}>
                   <div className={currentStyles.infoRow}>
-                    <p>{`About ${currentUser.firstName}: ${currentUser.about || ''}`}</p>
-                  </div>
-                  <div className={currentStyles.infoRow}>
                     <p>{`Rating: ${currentUser.rating}`}</p>
                   </div>
                   <div className={currentStyles.infoRow}>
-                    <p>{`Game level: ${currentUser.gameLevel || ''}`}</p>
+                    <EditableContent
+                      value={currentUser.about || ''}
+                      label={`About ${currentUser.firstName}`}
+                      maxLength={100}
+                      param='about'
+                      onChange={handleFieldChange}
+                    />
+                  </div>
+                  <div className={currentStyles.infoRow}>
+                    <EditableContent
+                      value={currentUser.gameLevel || ''}
+                      label='Game level'
+                      maxLength={100}
+                      param='gameLevel'
+                      onChange={handleFieldChange}
+                    />
                   </div>
                 </div>
                 <Button
@@ -115,6 +155,11 @@ const Profile = (props: TProps) => {
                   onCancel={() => {}}
                   onApply={() => {}}
                 />*/}
+                {isOwner && (
+                  <button className={currentStyles.logout} onClick={handleLogout}>
+                    Logout
+                  </button>
+                )}
               </>
             ) : (
               <Logo style='min' />
