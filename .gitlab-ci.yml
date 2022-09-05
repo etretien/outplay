@@ -33,7 +33,7 @@ build_server:
 
 deploy:
   stage: deploy
-  image: docker/copmpose:latest
+  image: docker/compose:latest
   tags:
     - shared_build
   before_script:
@@ -41,3 +41,5 @@ deploy:
   script:
     - cd server
     - docker-compose up -d --force-recreate
+  needs:
+    - job: build_server
