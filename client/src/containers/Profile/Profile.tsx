@@ -1,15 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '@nanostores/react';
-import cn from 'classnames';
 
 import $api from '../../api';
-
-import Button from '../../components/Button/Button';
-import Alert from '../../components/Alert/Alert';
-import Menu from '../../components/Menu/Menu';
-import Avatar from '../../components/Avatar/Avatar';
-import Logo from '../../components/Logo/Logo';
-import EditableContent from '../../components/EditableContent/EditableContent';
 
 import { INNER_MENU_PROFILE, REFRESH_TOKEN_NAME, USER_EMAIL_NAME } from '../../helpers/consts';
 
@@ -19,8 +11,9 @@ import { countries as countriesStore } from '../../stores/countries';
 
 import { toBase64 } from '../../helpers/converters';
 
-import styles from '../../App.module.scss';
 import currentStyles from './Profile.module.scss';
+
+import ProfileView from './Profile.view';
 
 import { TUser } from '../../types/app-types';
 
@@ -37,6 +30,7 @@ const Profile = (props: TProps) => {
   const countries = useStore(countriesStore);
 
   const [currentUser, setCurrentUser] = useState<TUser | null>(propUser || profile || null);
+  const [challengeMode, setChallengeMode] = useState<boolean>(false);
 
   useEffect(() => {
     setCurrentUser(propUser || profile);
@@ -97,78 +91,23 @@ const Profile = (props: TProps) => {
       .catch((e) => console.log('Updating profile error: ', e));
   };
 
+  const handleModeChange = () => setChallengeMode((prevState) => !prevState);
+
   return (
-    <div
-      className={cn(currentStyles.profile, { [currentStyles.profileSmall]: isSmall })}
-      role='presentation'
-      onClick={isSmall ? handleClick : undefined}
-    >
-      <div className={styles.container}>
-        <div className={currentStyles.avatar}>
-          <Avatar
-            countryCode={currentUser?.countryCode || ''}
-            countryName={countries[currentUser?.countryCode || '']}
-            avatar={currentUser?.avatar || null}
-            canUpload={isOwner && !isSmall}
-            onUpload={handleUploadAvatar}
-          />
-        </div>
-        {!isSmall && (
-          <>
-            <h2>{isOwner && currentUser && `Token balance: ${currentUser.balance}`}</h2>
-            {isLoaded && currentUser ? (
-              <>
-                <h1>{`${currentUser.firstName} ${currentUser.lastName}`}</h1>
-                <div className={currentStyles.info}>
-                  <div className={currentStyles.infoRow}>
-                    <p>{`Rating: ${currentUser.rating}`}</p>
-                  </div>
-                  <div className={currentStyles.infoRow}>
-                    <EditableContent
-                      value={currentUser.about || ''}
-                      label={`About ${currentUser.firstName}`}
-                      maxLength={100}
-                      param='about'
-                      onChange={handleFieldChange}
-                    />
-                  </div>
-                  <div className={currentStyles.infoRow}>
-                    <EditableContent
-                      value={currentUser.gameLevel || ''}
-                      label='Game level'
-                      maxLength={100}
-                      param='gameLevel'
-                      onChange={handleFieldChange}
-                    />
-                  </div>
-                </div>
-                <Button
-                  className={currentStyles.newChallenge}
-                  text='New challenge'
-                  onClick={() => {}}
-                  size='l'
-                />
-                {/*<Alert
-                  header={alertHeader}
-                  cancelText='Dismiss'
-                  applyText='Accept'
-                  onCancel={() => {}}
-                  onApply={() => {}}
-                />*/}
-                {isOwner && (
-                  <button className={currentStyles.logout} onClick={handleLogout}>
-                    Logout
-                  </button>
-                )}
-              </>
-            ) : (
-              <Logo style='min' />
-            )}
-            <Menu items={menuItems} />
-          </>
-        )}
-      </div>
-    </div>
+    <ProfileView
+      isSmall={isSmall}
+      onClick={handleClick}
+      currentUser={currentUser}
+      countries={countries}
+      isOwner={isOwner}
+      onUploadAvatar={handleUploadAvatar}
+      isLoaded={isLoaded}
+      onFieldChange={handleFieldChange}
+      isChallengeMode={challengeMode}
+      onModeChange={handleModeChange}
+      onLogout={handleLogout}
+      menuItems={menuItems}
+    />
   );
 };
 

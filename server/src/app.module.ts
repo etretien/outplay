@@ -4,15 +4,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import UserEntity from './user/user.entity';
 import AvatarEntity from './avatar/avatar.entity';
-
-/*import PermissionEntity from './permission/permission.entity';
-import GroupEntity from './group/group.entity';
-
-import { PermissionModule } from './permission/permission.module';
-import { GroupModule } from './group/group.module';
-*/
+import EventEntity from './event/event.entity';
+import ChallengeEntity from './challenge/challenge.entity';
+import CoefficientEntity from './coefficient/coefficient.entity';
 
 import { UserModule } from './user/user.module';
+import { EventModule } from './event/event.module';
+import { ChallengeModule } from './challenge/challenge.module';
 
 import { AuthModule } from './auth/auth.module';
 import { Encryption } from './core/encryption/encryption';
@@ -29,8 +27,15 @@ import { Mailing } from './core/mailing/mailing';
         username: config.get<string>('TYPEORM_USERNAME'),
         password: config.get<string>('TYPEORM_PASSWORD'),
         database: config.get<string>('TYPEORM_DATABASE'),
+        host: config.get<string>('TYPEORM_HOST'),
         port: +config.get<number>('TYPEORM_PORT') || 1234,
-        entities: [UserEntity, AvatarEntity],
+        entities: [
+          UserEntity,
+          AvatarEntity,
+          EventEntity,
+          ChallengeEntity,
+          CoefficientEntity,
+        ],
         synchronize: true,
       }),
     }),
@@ -38,9 +43,8 @@ import { Mailing } from './core/mailing/mailing';
     Mailing,
     AuthModule,
     UserModule,
-    /* PermissionModule,
-    GroupModule,
-    ,*/
+    EventModule,
+    ChallengeModule,
   ],
 })
 export class AppModule {}

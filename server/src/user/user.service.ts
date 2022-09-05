@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, ILike } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import UserEntity from './user.entity';
 import AvatarEntity from '../avatar/avatar.entity';
@@ -94,6 +94,17 @@ export class UserService {
       },
     });
     return { users, total };
+  }
+
+  async getUserById(id: number) {
+    return this.userRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        avatar: true,
+      },
+    });
   }
 
   /*

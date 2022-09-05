@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.5'
 
 services:
   db:
@@ -13,6 +13,22 @@ services:
       - POSTGRES_DB=${TYPEORM_DATABASE}
     volumes:
       - data:/var/lib/postgresql/data
+    networks:
+      - postgres
+
+  outplay-backend:
+    container_name: outplay-backend
+    image: gitlab.vercloud.ru:5050/lucid/outplay/outplay:6c9ddfa1215699f529db1058ec0ceddb06555b8d
+    restart: unless-stopped
+    networks:
+      - backend
 
 volumes:
   data:
+
+
+networks:
+  postgres:
+    name: outplay-net
+  backend:
+    name: outplay-net
