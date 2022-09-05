@@ -1,38 +1,13 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
-import cn from 'classnames';
-
-import Profile from '../Profile/Profile';
-import Button from '../../components/Button/Button';
-import Select from '../../components/Select/Select';
-import Avatar from '../../components/Avatar/Avatar';
-import Menu from '../../components/Menu/Menu';
 
 import { users as usersStore, getUsers } from '../../stores/users';
 import { countries as countriesStore } from '../../stores/countries';
 import { setRoute } from '../../stores/route';
 
-import appStyles from '../../App.module.scss';
-import styles from './Players.module.scss';
-
 import { INNER_MENU } from '../../helpers/consts';
 
-import { TUser } from '../../types/app-types';
-
-const UsersSkeleton = () => {
-  return (
-    <>
-      {Array(4)
-        .fill(0)
-        .map((_, index) => (
-          <div className={cn(styles.player, styles.playerLoading)} key={index}>
-            <div className={styles.avatar} />
-            <div className={styles.info}></div>
-          </div>
-        ))}
-    </>
-  );
-};
+import PlayersView from './Players.view';
 
 const Players = () => {
   const { list: users, isLoaded: isLoadedUsers } = useStore(usersStore);
@@ -71,68 +46,17 @@ const Players = () => {
   };
 
   return (
-    <div className={styles.players}>
-      <Button
-        text='Back'
-        className={appStyles.back}
-        onClick={handleBack}
-        size='s'
-        color='transparent'
-      />
-      <Profile isOwner isSmall />
-      <div className={appStyles.container}>
-        <h1>Rating</h1>
-        <div className={styles.filters}>
-          <div className={styles.filter}>
-            <Select
-              selected={filter1Option}
-              placeholder='Filter'
-              options={[
-                { value: 'opt1', text: 'Option 1' },
-                { value: 'opt2', text: 'Option 2' },
-              ]}
-              onChange={handleFilter1Change}
-            />
-          </div>
-          <div className={styles.filter}>
-            <Select
-              selected={filter2Option}
-              placeholder='Filter'
-              options={[
-                { value: 'opt1', text: 'Option 1' },
-                { value: 'opt2', text: 'Option 2' },
-              ]}
-              onChange={handleFilter2Change}
-            />
-          </div>
-        </div>
-        <div className={styles.list}>
-          {isLoadedUsers ? (
-            users.map((user: TUser) => (
-              <button
-                className={styles.player}
-                onClick={(e) => setRoute({ event: e, link: `players/${user.id}` })}
-                key={user.id}
-              >
-                <div className={styles.avatar}>
-                  <Avatar
-                    countryCode={user.countryCode}
-                    countryName={countries[user.countryCode]}
-                    avatar={user.avatar}
-                  />
-                </div>
-                <div className={styles.info}>
-                  <p>{`${user.firstName} ${user.lastName}`}</p>
-                </div>
-              </button>
-            ))
-          ) : (
-            <UsersSkeleton />
-          )}
-        </div>
-        <Menu items={menuItems} />
-      </div>
-    </div>
+    <PlayersView
+      onClickBack={handleBack}
+      filter1Option={filter1Option}
+      filter2Option={filter2Option}
+      onFilter1Change={handleFilter1Change}
+      onFilter2Change={handleFilter2Change}
+      isLoadedUsers={isLoadedUsers}
+      users={users}
+      countries={countries}
+      menuItems={menuItems}
+    />
   );
 };
 

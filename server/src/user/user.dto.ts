@@ -1,12 +1,6 @@
 import {
   IsString,
-  MinLength,
   MaxLength,
-  Matches,
-  Min,
-  Max,
-  IsNumber,
-  IsArray,
   IsOptional,
   IsNotEmpty,
   IsEnum,
@@ -14,7 +8,6 @@ import {
 } from 'class-validator';
 
 import { TYPE } from '../avatar/avatar.dto';
-import { Column } from 'typeorm';
 
 export enum STATUS {
   ACTIVE = 'ACTIVE',
