@@ -35,11 +35,11 @@ deploy:
   stage: deploy
   image: docker/compose:latest
   tags:
-    - shared_build
+    - outplay
   before_script:
     - docker login ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE} -u $REG_USER -p $REG_TOKEN
   script:
     - cd server
     - docker-compose up -d --force-recreate
   needs:
-    - job: outplay
+    - job: build_server
