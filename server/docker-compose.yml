@@ -18,7 +18,7 @@ services:
 
   outplay-backend:
     container_name: outplay-backend
-    image: gitlab.vercloud.ru:5050/lucid/outplay/outplay:6c9ddfa1215699f529db1058ec0ceddb06555b8d
+    image: ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_SHA}
     restart: unless-stopped
     networks:
       - backend

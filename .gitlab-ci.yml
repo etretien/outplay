@@ -30,3 +30,14 @@ build_server:
     - docker build -t ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_SHA} -t ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:latest .
     - docker push ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_SHA}
     - docker push ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:latest
+
+deploy:
+  stage: deploy
+  image: docker/copmpose:latest
+  tags:
+    - shared_build
+  before_script:
+    - docker login ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE} -u $REG_USER -p $REG_TOKEN
+  script:
+    - cd server
+    - docker-compose up -d --force-recreate
