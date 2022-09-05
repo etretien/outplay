@@ -42,4 +42,4 @@ deploy:
     - cd server
     - docker-compose up -d --force-recreate
   needs:
-    - job: build_server
+    - job: outplay
