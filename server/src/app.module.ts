@@ -28,7 +28,10 @@ import { Mailing } from './core/mailing/mailing';
         username: config.get<string>('TYPEORM_USERNAME'),
         password: config.get<string>('TYPEORM_PASSWORD'),
         database: config.get<string>('TYPEORM_DATABASE'),
-        host: config.get<string>('TYPEORM_HOST'),
+        host:
+          process.env.NODE_ENV === 'development'
+            ? config.get<string>('TYPEORM_HOST_DEV')
+            : config.get<string>('TYPEORM_HOST'),
         port: +config.get<number>('TYPEORM_PORT') || 1234,
         entities: [
           UserEntity,

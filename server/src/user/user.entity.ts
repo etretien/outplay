@@ -102,6 +102,13 @@ class UserEntity {
   })
   activationLink: string;
 
+  @Column({
+    length: 300,
+    select: false,
+    nullable: true,
+  })
+  restoreLink: string;
+
   @OneToOne(() => AvatarEntity, (avatar) => avatar.user)
   @JoinColumn()
   avatar: Relation<AvatarEntity>;

@@ -24,7 +24,7 @@ type TProps = {
   isChallengeMode: boolean;
   onModeChange: () => void;
   onLogout: () => void;
-  menuItems: { to: string; text: string; isActive: boolean }[];
+  menuItems: { to: string; text: string; isActive: boolean; icon: JSX.Element }[];
   onChallengePlayer: (id: number) => void;
 };
 

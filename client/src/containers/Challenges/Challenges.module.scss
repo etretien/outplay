@@ -6,10 +6,7 @@
 
 .list {
   width: 100%;
-}
-
-.list + .list {
-  margin-top: 32px;
+  margin-bottom: 32px;
 }
 
 .challenge,

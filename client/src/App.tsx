@@ -96,6 +96,7 @@ function App() {
     const expired = popup.from === 'expired';
     setPopup({});
     if (isSignup || activationError || expired) setRoute({ event: null, link: 'sign-in' });
+    if (popup.from === 'restore-email') setRoute({ event: null, link: 'forgot-password' });
   };
 
   const renderComponent = () => {
@@ -105,6 +106,7 @@ function App() {
       case 'sign-up':
       case 'forgot-password':
       case 'activate':
+      case 'restore-password':
         return <Auth visitorId={visitorId} />;
       case 'profile':
         return <Profile />;

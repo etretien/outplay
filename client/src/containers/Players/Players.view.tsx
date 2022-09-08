@@ -24,7 +24,7 @@ type TProps = {
   isLoadedUsers: boolean;
   users: TUser[];
   countries: { [field: string]: string };
-  menuItems: { to: string; text: string; isActive: boolean }[];
+  menuItems: { to: string; text: string; isActive: boolean; icon: JSX.Element }[];
 };
 
 import styles from './Players.module.scss';

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail, IsNumber } from 'class-validator';
 
 export class AuthDto {
   @IsNotEmpty()
@@ -9,4 +9,18 @@ export class AuthDto {
   @IsNotEmpty()
   @IsString({ message: 'Password must be string' })
   password: string;
+}
+
+export class UpdatePasswordDto {
+  @IsNotEmpty()
+  @IsString({ message: 'Password must be string' })
+  password: string;
+
+  @IsNotEmpty()
+  @IsString({ message: 'Restore code must be string' })
+  restoreCode: string;
+
+  @IsNotEmpty()
+  @IsNumber({}, { message: 'User id must be number' })
+  userId: number;
 }

@@ -4,18 +4,23 @@ import {
   HttpException,
   HttpStatus,
   Post,
-  Req,
   UseGuards,
 } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 
 import { EncryptionService } from '../core/encryption/encryption';
 import { AuthService } from './auth.service';
+import { MailingService } from '../core/mailing/mailing';
 
-import { AuthDto } from './auth.dto';
+import { AuthDto, UpdatePasswordDto } from './auth.dto';
 import { STATUS } from '../user/user.dto';
 
 import { AccessTokenGuard } from '../core/guards/access-token.guard';
+import {
+  generateActivationLetter,
+  generateRestoreLetter,
+} from '../core/helpers/mailing';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +28,7 @@ export class AuthController {
     private authService: AuthService,
     private jwtService: JwtService,
     private encryptionService: EncryptionService,
+    private mailingService: MailingService,
   ) {}
 
   private async generateTokens(sub: number, email: string) {
@@ -79,6 +85,7 @@ export class AuthController {
     );
     await this.authService.updateRefreshToken(user.id, refreshToken);
     delete user.password;
+    delete user.restoreLink;
     return {
       user,
       accessToken,
@@ -111,6 +118,80 @@ export class AuthController {
 
     const success = await this.authService.activateUser(user.id);
     return { success };
+  }
+
+  @Post('reactivate')
+  async reactivate(@Body() data: { email: string }) {
+    const user = await this.authService.getUserByEmail(data.email);
+    if (!user)
+      throw new HttpException('Email was not found', HttpStatus.BAD_REQUEST);
+
+    try {
+      const { html, text } = generateActivationLetter(user.activationLink);
+      const message = await this.mailingService.sendEmail(
+        data.email,
+        'Outplay: activation letter',
+        html,
+        text,
+      );
+      return {
+        success: !!message.messageId,
+        activationLink: user.activationLink,
+      };
+    } catch (e) {
+      return { success: false, error: e, activationLink: user.activationLink };
+    }
+  }
+
+  @Post('restore-password')
+  async restorePassword(@Body() data: { email: string }) {
+    const user = await this.authService.getUserByEmail(data.email);
+    if (!user)
+      throw new HttpException('Email is not found', HttpStatus.BAD_REQUEST);
+
+    if (user.status === STATUS.DELETED)
+      throw new HttpException(
+        'Cannot restore password. Account is deleted',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    if (user.status === STATUS.NOT_ACTIVE)
+      throw new HttpException(
+        'Cannot restore password. Account is not activated',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    const link = uuidv4();
+    const restoreLink = await this.jwtService.signAsync(
+      {
+        sub: link,
+        email: data.email,
+      },
+      { secret: process.env.JWT_REFRESH_SECRET },
+    );
+
+    const success = await this.authService.restorePassword(
+      user.id,
+      restoreLink,
+    );
+    if (!success) {
+      throw new HttpException(
+        'Cannot restore password',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    try {
+      const { html, text } = generateRestoreLetter(restoreLink);
+      const message = await this.mailingService.sendEmail(
+        data.email,
+        'Outplay: restore password',
+        html,
+        text,
+      );
+      return { success: !!message.messageId, restoreLink };
+    } catch (e) {
+      return { success: false, error: e, restoreLink };
+    }
   }
 
   @Post('refresh')
@@ -150,10 +231,49 @@ export class AuthController {
     );
     delete userFromDb.refreshToken;
     delete userFromDb.password;
+    delete userFromDb.restoreLink;
     return {
       user: userFromDb,
       ...tokens,
     };
+  }
+
+  @Post('validate-restore-code')
+  async validateRestoreCode(@Body() data: { code: string }) {
+    const decoded = this.decodeToken(data.code);
+    const isValidToken = await this.jwtService.verify(data.code, {
+      secret: process.env.JWT_REFRESH_SECRET,
+    });
+    if (!isValidToken)
+      throw new HttpException(
+        'Forbidden. Code is invalid',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    return this.authService.validateRestoreCode(
+      (decoded as { [field: string]: string }).email,
+      data.code,
+    );
+  }
+
+  @Post('update-password')
+  async updatePassword(@Body() data: UpdatePasswordDto) {
+    const decoded = this.decodeToken(data.restoreCode);
+    const isValidToken = await this.jwtService.verify(data.restoreCode, {
+      secret: process.env.JWT_REFRESH_SECRET,
+    });
+    if (!isValidToken)
+      throw new HttpException(
+        'Forbidden. Code is invalid',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    const validated = await this.authService.validateRestoreCode(
+      (decoded as { [field: string]: string }).email,
+      data.restoreCode,
+    );
+    const hashedPassword = await this.encryptionService.hashData(data.password);
+    return this.authService.updatePassword(validated.id, hashedPassword);
   }
 
   @UseGuards(AccessTokenGuard)

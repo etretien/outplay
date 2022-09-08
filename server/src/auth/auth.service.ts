@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import UserEntity from '../user/user.entity';
 
-import { AuthDto } from './auth.dto';
 import { STATUS } from '../user/user.dto';
+import { generateActivationLetter } from '../core/helpers/mailing';
 
 @Injectable()
 export class AuthService {
@@ -36,6 +36,7 @@ export class AuthService {
         'password',
         'status',
         'balance',
+        'restoreLink',
         ...this.commonFields,
       ],
       relations: {
@@ -59,7 +60,14 @@ export class AuthService {
       where: {
         id,
       },
-      select: ['id', 'email', 'password', 'refreshToken', ...this.commonFields],
+      select: [
+        'id',
+        'email',
+        'password',
+        'refreshToken',
+        'restoreLink',
+        ...this.commonFields,
+      ],
       relations: {
         avatar: true,
       },
@@ -100,6 +108,23 @@ export class AuthService {
     return false;
   }
 
+  async restorePassword(id: number, restoreLink: string) {
+    const userToUpdate = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (userToUpdate) {
+      const newUser = {
+        ...userToUpdate,
+        restoreLink,
+      };
+      await this.userRepository.save(newUser);
+      return true;
+    }
+    return false;
+  }
+
   async destroyToken(id: number) {
     const userToUpdate = await this.userRepository.findOne({
       where: {
@@ -112,6 +137,32 @@ export class AuthService {
         refreshToken: null,
       };
       return this.userRepository.save(newUser);
+    }
+    return undefined;
+  }
+
+  async validateRestoreCode(email: string, code: string) {
+    const userFromDb = await this.getUserByEmail(email);
+    if (!userFromDb || userFromDb.restoreLink !== code)
+      throw new HttpException(
+        'Forbidden. Code is invalid',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    return { code, id: userFromDb.id };
+  }
+
+  async updatePassword(id: number, password: string) {
+    const userToUpdate = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (userToUpdate) {
+      userToUpdate.password = password;
+      userToUpdate.restoreLink = null;
+      await this.userRepository.save(userToUpdate);
+      return { success: true };
     }
     return undefined;
   }
