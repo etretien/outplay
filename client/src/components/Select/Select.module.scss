@@ -4,6 +4,10 @@
   position: relative;
   width: 100%;
   z-index: 9;
+
+  &.opened {
+    z-index: 10;
+  }
 }
 
 .result {

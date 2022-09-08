@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import cn from 'classnames';
 import { useStore } from '@nanostores/react';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
@@ -8,6 +8,7 @@ import Profile from './containers/Profile/Profile';
 import Player from './containers/Player/Player';
 import Players from './containers/Players/Players';
 import NotFound from './containers/NotFound/NotFound';
+import Challenges from './containers/Challenges/Challenges';
 
 import Popup from './components/Popup/Popup';
 import Logo from './components/Logo/Logo';
@@ -18,6 +19,7 @@ import { setAccessToken } from './stores/accessToken';
 import { popup as popupStore, setPopup } from './stores/popup';
 import { route as routeStore, setRoute } from './stores/route';
 import { profile as profileStore, setProfile } from './stores/profile';
+import { getChallenges } from './stores/challenges';
 
 import { REFRESH_TOKEN_NAME, USER_EMAIL_NAME } from './helpers/consts';
 import { hashEmail } from './helpers/hash';
@@ -32,10 +34,21 @@ function App() {
   const route = useStore(routeStore);
   const user = useStore(profileStore);
 
+  const interval = useRef<NodeJS.Timer>();
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [refreshToken] = useState<string | null>(localStorage.getItem(REFRESH_TOKEN_NAME));
   const [userEmail] = useState<string | null>(localStorage.getItem(USER_EMAIL_NAME));
   const [visitorId, setVisitorId] = useState<string>('');
+
+  useEffect(() => {
+    if (user.profile) {
+      interval.current = setInterval(getChallenges.bind(null, user.profile.id), 30 * 1000);
+      return () => {
+        clearInterval(interval.current);
+      };
+    }
+  }, [user.profile]);
 
   useEffect(() => {
     const fpPromise = FingerprintJS.load();
@@ -86,7 +99,7 @@ function App() {
   };
 
   const renderComponent = () => {
-    if (route.indexOf('players/') !== -1) return <Player />;
+    if (route.indexOf('players/') !== -1) return <Player link='players' />;
     switch (route) {
       case 'sign-in':
       case 'sign-up':
@@ -97,6 +110,8 @@ function App() {
         return <Profile />;
       case 'players':
         return <Players />;
+      case 'challenges':
+        return <Challenges link='profile' />;
       default:
         return <NotFound />;
     }

@@ -12,6 +12,7 @@ import EventEntity from '../event/event.entity';
 import ChallengeEntity from './challenge.entity';
 import CoefficientEntity from '../coefficient/coefficient.entity';
 import AvatarEntity from '../avatar/avatar.entity';
+import ResultEntity from '../result/result.entity';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import AvatarEntity from '../avatar/avatar.entity';
       EventEntity,
       CoefficientEntity,
       AvatarEntity,
+      ResultEntity,
     ]),
   ],
   controllers: [ChallengeController],

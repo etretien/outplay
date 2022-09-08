@@ -31,6 +31,10 @@
     &:hover {
       color: $blue-500;
     }
+
+    svg {
+      display: none;
+    }
   }
 
   .badge {
@@ -52,5 +56,22 @@
 .listItemActive {
   button {
     color: $blue-500;
+  }
+}
+
+@media screen and (max-width: 510px) {
+
+  .listItem {
+
+    button {
+      span {
+        display: none;
+      }
+      svg {
+        width: 30px;
+        height: 30px;
+        display: block;
+      }
+    }
   }
 }

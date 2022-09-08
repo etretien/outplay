@@ -5,8 +5,8 @@ import {
   JoinColumn,
   Relation,
   ManyToMany,
-  OneToMany,
   ManyToOne,
+  OneToOne,
 } from 'typeorm';
 
 import { RESULT, STATUS } from './challenge.dto';
@@ -34,19 +34,19 @@ class ChallengeEntity {
   })
   result: number;
 
-  @ManyToOne(() => EventEntity, (event) => event)
+  @ManyToOne(() => EventEntity)
   @JoinColumn()
   event: Relation<EventEntity>;
 
-  @ManyToMany(() => UserEntity, (user) => user)
+  @ManyToOne(() => UserEntity)
   @JoinColumn()
   user: Relation<UserEntity>;
 
-  @ManyToMany(() => UserEntity, (user) => user)
+  @ManyToOne(() => UserEntity)
   @JoinColumn()
   creator: Relation<UserEntity>;
 
-  @OneToMany(() => CoefficientEntity, (coef) => coef.value)
+  @ManyToOne(() => CoefficientEntity, (coef) => coef)
   @JoinColumn()
   coefficient: Relation<CoefficientEntity>;
 }

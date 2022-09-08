@@ -25,9 +25,33 @@ type TProps = {
   onModeChange: () => void;
   onLogout: () => void;
   menuItems: { to: string; text: string; isActive: boolean }[];
+  onChallengePlayer: (id: number) => void;
 };
 
 const ProfileView = (props: TProps) => {
+  const renderMyChallenge = () => {
+    if (props.isChallengeMode) return <NewChallenge onCancel={props.onModeChange} />;
+    return (
+      <Button
+        className={currentStyles.newChallenge}
+        text='New challenge'
+        onClick={props.onModeChange}
+        size='l'
+      />
+    );
+  };
+
+  const renderChallenge = () => {
+    return (
+      <Button
+        className={currentStyles.newChallenge}
+        text='Challenge player'
+        onClick={() => props.onChallengePlayer(props.currentUser!.id)}
+        size='l'
+      />
+    );
+  };
+
   return (
     <div
       className={cn(currentStyles.profile, { [currentStyles.profileSmall]: props.isSmall })}
@@ -75,16 +99,7 @@ const ProfileView = (props: TProps) => {
                     />
                   </div>
                 </div>
-                {props.isChallengeMode ? (
-                  <NewChallenge onCancel={props.onModeChange} />
-                ) : (
-                  <Button
-                    className={currentStyles.newChallenge}
-                    text='New challenge'
-                    onClick={props.onModeChange}
-                    size='l'
-                  />
-                )}
+                {props.isOwner ? renderMyChallenge() : renderChallenge()}
                 {/*<Alert
                   header={alertHeader}
                   cancelText='Dismiss'

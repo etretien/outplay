@@ -2,7 +2,7 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  OneToOne,
+  ManyToOne,
   JoinColumn,
   Relation,
   ManyToMany,
@@ -11,11 +11,7 @@ import {
 
 import UserEntity from '../user/user.entity';
 
-export enum STATUS {
-  PENDING = 'PENDING',
-  FINISHED = 'FINISHED',
-  FAILED = 'FAILED',
-}
+import { STATUS } from './event.dto';
 
 @Entity('event')
 class EventEntity {
@@ -35,11 +31,13 @@ class EventEntity {
 
   @Column({
     type: 'timestamp',
+    nullable: true,
   })
   startDate: string;
 
   @Column({
     type: 'timestamp',
+    nullable: true,
   })
   endDate: string;
 
@@ -58,7 +56,7 @@ class EventEntity {
   @JoinTable()
   winners: Relation<UserEntity[]>;
 
-  @OneToOne(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity)
   @JoinColumn()
   creator: Relation<UserEntity>;
 }

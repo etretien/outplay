@@ -7,6 +7,7 @@ import AvatarEntity from './avatar/avatar.entity';
 import EventEntity from './event/event.entity';
 import ChallengeEntity from './challenge/challenge.entity';
 import CoefficientEntity from './coefficient/coefficient.entity';
+import ResultEntity from './result/result.entity';
 
 import { UserModule } from './user/user.module';
 import { EventModule } from './event/event.module';
@@ -35,6 +36,7 @@ import { Mailing } from './core/mailing/mailing';
           EventEntity,
           ChallengeEntity,
           CoefficientEntity,
+          ResultEntity,
         ],
         synchronize: true,
       }),

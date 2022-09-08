@@ -5,7 +5,7 @@ import { ChangeEvent } from 'react';
 
 type TProps = {
   id: string;
-  label: string;
+  label?: string;
   value: string;
   type: string;
   error?: string;
@@ -23,7 +23,7 @@ const Input = (props: TProps) => {
 
   return (
     <div className={cn(styles.input, className, { [styles.error]: !!error?.length })}>
-      <label htmlFor={id}>{label}</label>
+      {label && <label htmlFor={id}>{label}</label>}
       <input id={id} type={type} value={value} onChange={handleChange} />
       {error && <span className={styles.inputError}>{error}</span>}
     </div>

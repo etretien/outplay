@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useStore } from '@nanostores/react';
 import cn from 'classnames';
 
+import withInnerView from '../../hocs/withInnerView';
+
 import { users as usersStore, getUsers } from '../../stores/users';
 import { route as routeStore } from '../../stores/route';
 
@@ -46,9 +48,8 @@ const Player = () => {
       ) : (
         <h1 className={styles.notFound}>Sorry, no user found</h1>
       )}
-      <Profile isOwner isSmall />
     </div>
   );
 };
 
-export default Player;
+export default withInnerView(Player);

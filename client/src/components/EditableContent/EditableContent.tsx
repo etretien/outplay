@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, ClipboardEvent, useState } from 'react';
 
 import { FaPen } from 'react-icons/fa';
 import { IoMdCheckmarkCircle, IoMdCloseCircle } from 'react-icons/io';
@@ -32,11 +32,15 @@ const EditableContent = (props: TProps) => {
     setIsEditMode(false);
   };
 
+  const handlePasteValue = (e: ClipboardEvent<HTMLTextAreaElement>) => {
+    setValue(e.clipboardData.getData('text').slice(0, props.maxLength));
+  };
+
   if (isEditMode) {
     return (
       <div className={styles.editMode}>
         <label>{props.label}</label>
-        <textarea value={value} onChange={handleValueChange}></textarea>
+        <textarea value={value} onChange={handleValueChange} onPaste={handlePasteValue}></textarea>
         <div className={styles.actions}>
           <button onClick={handleApply}>
             <IoMdCheckmarkCircle />

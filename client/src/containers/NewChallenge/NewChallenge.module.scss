@@ -22,7 +22,7 @@
 .list {
   margin-bottom: 24px;
   max-height: 400px;
-  overflow-y: auto;
+  overflow: auto;
   scrollbar-gutter: stable
 }
 
@@ -116,5 +116,13 @@
   div[class*="input"] {
     margin-top: 0 !important;
     width: 45%;
+
+    input {
+      font-size: 20px;
+    }
   }
+}
+
+.error {
+  color: red;
 }

@@ -3,7 +3,7 @@
 body {
     font-family: 'Inter', sans-serif;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 16px;
     color: $black;
     background-color: $main-gray;
     height: 100%;
@@ -44,6 +44,25 @@ body * {
     font-weight: 500;
     z-index: 2;
     height: auto;
+}
+
+.innerContainer {
+    padding-top: 130px;
+}
+
+.link {
+    border: unset;
+    outline: none;
+    color: $blue-500;
+    cursor: pointer;
+    background-color: transparent;
+    white-space: nowrap;
+    transition: color 200ms;
+
+    &:hover {
+        color: darken($blue-500, 5%);
+    }
+
 }
 
 #root {

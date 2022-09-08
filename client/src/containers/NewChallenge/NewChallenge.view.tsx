@@ -17,9 +17,11 @@ type TProps = {
   nameValue: string;
   startDate: string;
   endDate: string;
+  errors: Record<string, string>;
   onChangeName: (value: string) => void;
   onChangeDate: (value: string, param: string) => void;
   onCancel: () => void;
+  onApply: () => void;
 };
 
 const NewChallengeView = (props: TProps) => {
@@ -60,15 +62,17 @@ const NewChallengeView = (props: TProps) => {
           label='Challenge name'
           value={props.nameValue}
           type='text'
+          error={props.errors.nameValue}
           onChange={props.onChangeName}
         />
-        <div className={styles.dates}>
+        {/*<div className={styles.dates}>
           <Input
             id='challenge-start'
             label='Start date'
             value={props.startDate}
             type='date'
             param='startDate'
+            error={props.errors.startDate}
             onChange={props.onChangeDate}
           />
           <Input
@@ -77,12 +81,14 @@ const NewChallengeView = (props: TProps) => {
             value={props.endDate}
             type='date'
             param='endDate'
+            error={props.errors.endDate}
             onChange={props.onChangeDate}
           />
-        </div>
+        </div>*/}
       </div>
+      <p className={styles.error}>{props.errors.selected}&nbsp;</p>
       <div className={styles.actions}>
-        <Button text='Accept' color='green' onClick={() => {}} size='m' />
+        <Button text='Confirm' color='green' onClick={props.onApply} size='m' />
         <Button text='Cancel' color='gray' onClick={props.onCancel} size='m' />
       </div>
     </div>

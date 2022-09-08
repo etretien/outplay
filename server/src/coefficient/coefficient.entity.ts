@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 import { TYPE } from './coefficient.dto';
 
-@Entity('avatar')
+@Entity('coefficient')
 class CoefficientEntity {
   @PrimaryGeneratedColumn()
   id: number;

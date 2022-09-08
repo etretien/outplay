@@ -1,7 +1,7 @@
 import cn from 'classnames';
 
-import Button from '../../components/Button/Button';
-import Profile from '../Profile/Profile';
+import withInnerView from '../../hocs/withInnerView';
+
 import Select from '../../components/Select/Select';
 import Avatar from '../../components/Avatar/Avatar';
 import Menu from '../../components/Menu/Menu';
@@ -29,6 +29,7 @@ type TProps = {
 
 import styles from './Players.module.scss';
 import appStyles from '../../App.module.scss';
+import { FunctionComponent } from 'react';
 
 const UsersSkeleton = () => {
   return (
@@ -45,17 +46,9 @@ const UsersSkeleton = () => {
   );
 };
 
-const PlayersView = (props: TProps) => {
+const PlayersView: FunctionComponent<TProps> = (props: TProps) => {
   return (
     <div className={styles.players}>
-      <Button
-        text='Back'
-        className={appStyles.back}
-        onClick={props.onClickBack}
-        size='s'
-        color='transparent'
-      />
-      <Profile isOwner isSmall />
       <div className={appStyles.container}>
         <h1>Rating</h1>
         <div className={styles.filters}>
@@ -112,4 +105,4 @@ const PlayersView = (props: TProps) => {
   );
 };
 
-export default PlayersView;
+export default withInnerView(PlayersView);

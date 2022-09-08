@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, ReactNode } from 'react';
 import cn from 'classnames';
 
 import useOutsideClick from '../../hooks/useOutsideClick';
@@ -18,27 +18,31 @@ type TProps = {
   options: Option[];
   className?: string;
   error?: string;
-  onChange: (value: Option) => void;
+  param?: string;
+  onChange: (value: Option, param: string | undefined) => void;
 };
 
 const Select = (props: TProps) => {
   const selectRef = useRef<HTMLDivElement | null>(null);
   const [optionsActive, setOptionsActive] = useState<boolean>(false);
 
-  useOutsideClick(
-    () => optionsActive && setOptionsActive(false),
-    [selectRef.current as React.ReactNode],
-  );
+  useOutsideClick(() => optionsActive && setOptionsActive(false), [selectRef.current as ReactNode]);
 
   const handleClick = () => setOptionsActive((prevState) => !prevState);
 
   const handleOptionClick = (option: Option) => {
     setOptionsActive(false);
-    props.onChange(option);
+    props.onChange(option, props.param);
   };
 
   return (
-    <div className={cn(styles.select, props.className, { [styles.selectError]: !!props.error })} ref={selectRef}>
+    <div
+      className={cn(styles.select, props.className, {
+        [styles.selectError]: !!props.error,
+        [styles.opened]: optionsActive,
+      })}
+      ref={selectRef}
+    >
       <div className={styles.result}>
         <button type='button' onClick={handleClick}>
           {props.selected?.text ?? props.placeholder ?? 'Select'}

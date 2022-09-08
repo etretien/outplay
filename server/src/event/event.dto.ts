@@ -1,13 +1,29 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsOptional,
+  IsNumber,
+  IsArray,
+  IsNotEmpty,
+} from 'class-validator';
 import { TYPE } from '../avatar/avatar.dto';
 
-/*
-export class UserPatchAvatarDto {
-    @IsOptional()
-    @IsString()
-    public avatar: string;
+export enum STATUS {
+  PENDING = 'PENDING',
+  FINISHED = 'FINISHED',
+  FAILED = 'FAILED',
+}
 
-    @IsOptional()
-    @IsEnum(TYPE, { message: 'Not a valid avatar type' })
-    public avatarType: TYPE;
-}*/
+export class EventPatchDto {
+  @IsNotEmpty()
+  @IsArray({ message: 'team1 must be an array' })
+  @IsNumber({}, { each: true, message: 'Not a valid value for team member id' })
+  team1: number[];
+
+  @IsNotEmpty()
+  @IsArray({ message: 'team2 must be an array' })
+  @IsNumber({}, { each: true, message: 'Not a valid value for team member id' })
+  team2: number[];
+
+  @IsNotEmpty()
+  sets: { team1: number; team2: number }[];
+}

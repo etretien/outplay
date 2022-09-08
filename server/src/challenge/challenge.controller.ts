@@ -4,7 +4,11 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Get,
   UseGuards,
+  Query,
+  Patch,
+  Param,
 } from '@nestjs/common';
 
 import { ChallengeService } from './challenge.service';
@@ -13,7 +17,7 @@ import { UserService } from '../user/user.service';
 
 import { AccessTokenGuard } from '../core/guards/access-token.guard';
 
-import { ChallengePostDto } from './challenge.dto';
+import { ChallengePostDto, STATUS } from './challenge.dto';
 
 @Controller('challenges')
 export class ChallengeController {
@@ -31,5 +35,20 @@ export class ChallengeController {
       throw new HttpException('Creator not found', HttpStatus.BAD_REQUEST);
 
     return this.challengeService.createChallenge(data, creator);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get()
+  async getChallenges(@Query() query: Record<string, string>) {
+    return this.challengeService.getChallenges(query);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id')
+  async updateChallenge(
+    @Param('id') id: number,
+    @Body() data: { status: STATUS },
+  ) {
+    return this.challengeService.updateChallenge(id, data.status);
   }
 }

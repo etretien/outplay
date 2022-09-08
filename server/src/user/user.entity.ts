@@ -81,6 +81,7 @@ class UserEntity {
   @Column({
     length: 100,
     nullable: true,
+    select: false,
   })
   minimaId: string;
 

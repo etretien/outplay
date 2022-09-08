@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -18,17 +18,21 @@ export class UserService {
   ) {}
 
   async updateAvatar(value: string, type: TYPE, userId: number) {
+    const userToUpdate = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    if (!userToUpdate)
+      throw new HttpException('No user found', HttpStatus.BAD_REQUEST);
+
     const avatar = new AvatarEntity();
     const newAvatar = await this.avatarRepository.save({
       ...avatar,
       type,
       value,
     });
-    const userToUpdate = await this.userRepository.findOne({
-      where: {
-        id: userId,
-      },
-    });
+
     await this.userRepository.save({
       ...userToUpdate,
       avatar: newAvatar,

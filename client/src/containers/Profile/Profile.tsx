@@ -8,14 +8,14 @@ import { INNER_MENU_PROFILE, REFRESH_TOKEN_NAME, USER_EMAIL_NAME } from '../../h
 import { profile as profileStore, setProfile } from '../../stores/profile';
 import { setRoute } from '../../stores/route';
 import { countries as countriesStore } from '../../stores/countries';
+import { challenges as challengesStore } from '../../stores/challenges';
 
 import { toBase64 } from '../../helpers/converters';
-
-import currentStyles from './Profile.module.scss';
 
 import ProfileView from './Profile.view';
 
 import { TUser } from '../../types/app-types';
+import { setPopup } from '../../stores/popup';
 
 type TProps = {
   isOwner?: boolean;
@@ -28,6 +28,7 @@ const Profile = (props: TProps) => {
 
   const { profile, isLoaded } = useStore(profileStore);
   const countries = useStore(countriesStore);
+  const challenges = useStore(challengesStore);
 
   const [currentUser, setCurrentUser] = useState<TUser | null>(propUser || profile || null);
   const [challengeMode, setChallengeMode] = useState<boolean>(false);
@@ -36,23 +37,14 @@ const Profile = (props: TProps) => {
     setCurrentUser(propUser || profile);
   }, [propUser, profile]);
 
-  const alertHeader = useMemo(
-    () => (
-      <span className={currentStyles.alertHeader}>
-        Challenge from <a href='players'>Night King</a>
-      </span>
-    ),
-    [],
-  );
-
   const menuItems = useMemo(
     () =>
       INNER_MENU_PROFILE.map((item) => ({
         ...item,
         isActive: isOwner ? item.to === 'profile' : item.to === 'players',
-        badge: item.to === 'my-challenges' ? 5 : null,
+        badge: item.to === 'challenges' ? challenges.list.length : null,
       })),
-    [isOwner],
+    [challenges.list.length, isOwner],
   );
 
   const handleClick = () => {
@@ -93,6 +85,31 @@ const Profile = (props: TProps) => {
 
   const handleModeChange = () => setChallengeMode((prevState) => !prevState);
 
+  const handleChallenge = (id: number) => {
+    $api
+      .post('challenges', {
+        creatorId: profile!.id,
+        userIds: [id],
+        eventName: 'PVP Challenge',
+      })
+      .then((response) => {
+        if (response.data.success) {
+          setPopup({
+            title: 'Challenge created',
+            message: 'Challenge was successfully created',
+            description: [],
+          });
+        } else {
+          setPopup({
+            title: 'Error',
+            message: 'There was an error during challenge creation. Please, try again',
+            description: [],
+          });
+        }
+      })
+      .catch((e) => console.log('Creating challenge error: ', e));
+  };
+
   return (
     <ProfileView
       isSmall={isSmall}
@@ -107,6 +124,7 @@ const Profile = (props: TProps) => {
       onModeChange={handleModeChange}
       onLogout={handleLogout}
       menuItems={menuItems}
+      onChallengePlayer={handleChallenge}
     />
   );
 };

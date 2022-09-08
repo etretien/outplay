@@ -4,6 +4,7 @@ import {
   IsArray,
   IsString,
   IsDate,
+  IsOptional,
 } from 'class-validator';
 import { Timestamp } from 'typeorm';
 
@@ -21,15 +22,7 @@ export enum RESULT {
 
 export class ChallengePostDto {
   @IsNotEmpty()
-  @IsNumber(null, { message: 'User id must be number' })
-  userId: number;
-
-  @IsNotEmpty()
-  @IsNumber(null, { message: 'Event id must be number' })
-  eventId: number;
-
-  @IsNotEmpty()
-  @IsNumber(null, { message: 'Creator id must be number' })
+  @IsNumber({}, { message: 'Creator id must be number' })
   creatorId: number;
 
   @IsNotEmpty()
@@ -41,11 +34,11 @@ export class ChallengePostDto {
   @IsString({ message: 'Event name must be string' })
   eventName: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDate({ message: 'Start must be date' })
   start: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDate({ message: 'End must be date' })
   end: Date;
 }

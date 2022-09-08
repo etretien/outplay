@@ -21,7 +21,7 @@ class AvatarEntity {
     enum: TYPE,
     default: TYPE.URL,
   })
-  type: string;
+  type: TYPE;
 
   @Column()
   value: string;
