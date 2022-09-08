@@ -1,8 +1,8 @@
-version: '3.9'
+version: '3.5'
 
 services:
   db:
-    container_name: postgres-nodejs-learning
+    container_name: postgres
     image: 'postgres'
     restart: always
     ports:
@@ -13,6 +13,26 @@ services:
       - POSTGRES_DB=${TYPEORM_DATABASE}
     volumes:
       - data:/var/lib/postgresql/data
+    networks:
+      - postgres
+
+  outplay-backend:
+    container_name: outplay-backend
+    links:
+      - db
+    image: ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_SHA}
+    restart: unless-stopped
+    networks:
+      - backend
+    ports:
+      - 5000:5000
 
 volumes:
   data:
+
+
+networks:
+  postgres:
+    name: outplay-net
+  backend:
+    name: outplay-net
