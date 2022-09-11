@@ -27,6 +27,21 @@ export class UserService {
     private mailingService: MailingService,
   ) {}
 
+  private setWhere(country: string, search: string) {
+    const where: Record<string, any>[] = [{ status: STATUS.ACTIVE }];
+    const [firstName, lastName = ''] = search.split(' ');
+    if (country && country.length) where[0].countryCode = country;
+    if (firstName && firstName.length)
+      where[0].firstName = ILike(`${firstName}%`);
+    if (lastName && lastName.length) where[0].lastName = ILike(`${lastName}%`);
+    if (firstName && firstName.length && !lastName.length) {
+      where[1] = { ...where[0] };
+      delete where[1].firstName;
+      where[1].lastName = ILike(`${firstName}%`);
+    }
+    return where;
+  }
+
   async updateAvatar(value: string, type: TYPE, userId: number) {
     const userToUpdate = await this.userRepository.findOne({
       where: {
@@ -130,17 +145,12 @@ export class UserService {
     country: string,
     search: string,
   ) {
-    const [firstName, lastName = ''] = search.split(' ');
+    const where = this.setWhere(country, search);
     const [users, total] = await this.userRepository.findAndCount({
       order: {
         rating: 'DESC',
       },
-      where: {
-        status: STATUS.ACTIVE,
-        countryCode: country.length ? country : undefined,
-        firstName: firstName.length ? ILike(`${firstName}%`) : undefined,
-        lastName: lastName.length ? ILike(`${lastName}%`) : undefined,
-      },
+      where,
       skip: offset,
       take: limit,
       relations: {
