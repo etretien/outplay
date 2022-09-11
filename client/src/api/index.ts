@@ -1,14 +1,17 @@
 import axios from 'axios';
 
 import { setPopup } from '../stores/popup';
-import { getRoute, setRoute } from '../stores/route';
 import { getAccessToken, setAccessToken } from '../stores/accessToken';
 
 import { REFRESH_TOKEN_NAME, USER_EMAIL_NAME } from '../helpers/consts';
 import { hashEmail } from '../helpers/hash';
 
+const isDev = import.meta.env.MODE === 'development';
+
 const $api = axios.create({
-  baseURL: `${import.meta.env.VITE_APP_SERVER_HOST}`,
+  baseURL: `${
+    isDev ? import.meta.env.VITE_APP_SERVER_DEV_HOST : import.meta.env.VITE_APP_SERVER_HOST
+  }`,
 });
 
 $api.interceptors.request.use(
