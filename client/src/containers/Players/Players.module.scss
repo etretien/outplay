@@ -10,14 +10,26 @@
 }
 
 .filters {
-  display: flex;
   width: 100%;
-  flex-wrap: wrap;
-  justify-content: center;
 }
 
 .filter {
-  width: 45%;
+  width: 100%;
+  position: relative;
+
+  button[class*='link'] {
+    min-width: 24px;
+    min-height: 24px;
+    color: $gray-600;
+    position: absolute;
+    top: 15px;
+    right: -40px;
+
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
 }
 
 .filter + .filter {
@@ -66,6 +78,7 @@
 .avatar {
   width: 100px;
   height: 100px;
+  position: relative;
 
   :global .avatar__flag {
     width: 30px;
@@ -86,6 +99,22 @@
   justify-content: flex-start;
   padding: 0 24px;
   font-size: 18px;
+}
+
+.rating {
+  position: absolute;
+  border-radius: 50%;
+  background-color: $blue-500;
+  color: $white;
+  font-weight: 700;
+  width: 30px;
+  height: 30px;
+  z-index: 2;
+  top: 0;
+  left: -20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media screen and (max-width: 600px) {

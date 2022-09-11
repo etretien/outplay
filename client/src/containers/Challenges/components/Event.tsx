@@ -10,7 +10,7 @@ const setDate = (string: string) => {
   const date = new Date(string);
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
-  const day = date.getDay();
+  const day = date.getDate();
   return `${day < 10 ? `0${day}` : day}.${month < 10 ? `0${month}` : month}.${year}`;
 };
 
@@ -109,7 +109,7 @@ const Event = (props: TEvent & TAdditionalProps) => {
                   <div className={styles.participant} key={user.id}>
                     <button
                       className={appStyles.link}
-                      onClick={(e) => props.setRoute({ event: null, link: `players/${user.id}` })}
+                      onClick={(e) => props.setRoute({ event: e, link: `players/${user.id}` })}
                     >
                       {`${user.firstName} ${user.lastName}`}
                     </button>

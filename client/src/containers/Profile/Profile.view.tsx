@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import { FaWallet } from 'react-icons/fa';
 
 import Avatar from '../../components/Avatar/Avatar';
 import EditableContent from '../../components/EditableContent/EditableContent';
@@ -24,6 +25,7 @@ type TProps = {
   isChallengeMode: boolean;
   onModeChange: () => void;
   onLogout: () => void;
+  onBalance: () => void;
   menuItems: { to: string; text: string; isActive: boolean; icon: JSX.Element }[];
   onChallengePlayer: (id: number) => void;
 };
@@ -71,7 +73,12 @@ const ProfileView = (props: TProps) => {
         {!props.isSmall && (
           <>
             <h2>
-              {props.isOwner && props.currentUser && `Token balance: ${props.currentUser.balance}`}
+              {props.isOwner && props.currentUser && (
+                <button className={styles.link} onClick={props.onBalance}>
+                  Token Balance
+                  <FaWallet />
+                </button>
+              )}
             </h2>
             {props.isLoaded && props.currentUser ? (
               <>
@@ -100,13 +107,6 @@ const ProfileView = (props: TProps) => {
                   </div>
                 </div>
                 {props.isOwner ? renderMyChallenge() : renderChallenge()}
-                {/*<Alert
-                  header={alertHeader}
-                  cancelText='Dismiss'
-                  applyText='Accept'
-                  onCancel={() => {}}
-                  onApply={() => {}}
-                />*/}
                 {props.isOwner && (
                   <button className={currentStyles.logout} onClick={props.onLogout}>
                     Logout

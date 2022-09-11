@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useStore } from '@nanostores/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import withInnerView from '../../hocs/withInnerView';
 
@@ -17,6 +18,28 @@ import $api from '../../api';
 import Logo from '../../components/Logo/Logo';
 import Event from './components/Event';
 
+const transformEvents = (data: {
+  ownEvents: TEvent[];
+  participant: TEvent[];
+}): { ownEvents: TEvent[]; ownPendingEvents: TEvent[]; participant: TEvent[] } => {
+  const own = data.ownEvents.reduce<{ ownEvents: TEvent[]; ownPendingEvents: TEvent[] }>(
+    (result, item) => {
+      if (
+        item.participants.every((item) => item.challenge.status === 'ACCEPTED') &&
+        item.status === 'PENDING'
+      ) {
+        return { ...result, ownPendingEvents: [...result.ownPendingEvents, item] };
+      }
+      return { ...result, ownEvents: [...result.ownEvents, item] };
+    },
+    { ownEvents: [], ownPendingEvents: [] },
+  );
+  return {
+    ...own,
+    participant: data.participant,
+  };
+};
+
 import { TEvent } from '../../types/app-types';
 
 const Challenges = () => {
@@ -24,13 +47,13 @@ const Challenges = () => {
   const { profile } = useStore(profileStore);
 
   const [history, setHistory] = useState<{
-    isLoaded: boolean;
+    isShown: boolean;
     isPending: boolean;
-    list: { ownEvents: TEvent[]; participant: TEvent[] };
+    list: { ownEvents: TEvent[]; ownPendingEvents: TEvent[]; participant: TEvent[] };
   }>({
-    isLoaded: false,
-    isPending: false,
-    list: { ownEvents: [], participant: [] },
+    isShown: false,
+    isPending: true,
+    list: { ownEvents: [], ownPendingEvents: [], participant: [] },
   });
 
   const handleViewHistory = () => {
@@ -38,17 +61,22 @@ const Challenges = () => {
     $api
       .get(`events?userId=${profile!.id}`)
       .then((result) => {
-        setHistory({
-          isLoaded: true,
+        setHistory((prevState) => ({
+          isShown: prevState.isShown,
           isPending: false,
-          list: result.data,
-        });
+          list: transformEvents(result.data),
+        }));
       })
       .catch((e) => {
         console.log('Getting events error: ', e);
-        setHistory((prevState) => ({ ...prevState, isPending: false, isLoaded: false }));
+        setHistory((prevState) => ({ ...prevState, isPending: false }));
       });
   };
+
+  useEffect(() => {
+    getChallenges(profile!.id).catch((e) => console.log('Getting events error: ', e));
+    handleViewHistory();
+  }, []);
 
   const handleReact = (id: number, status: string) => {
     $api
@@ -67,7 +95,6 @@ const Challenges = () => {
       })
       .catch((e) => console.log('Setting result error: ', e));
   };
-  console.log(history);
 
   const renderHistory = () => {
     return (
@@ -117,18 +144,26 @@ const Challenges = () => {
               </div>
             </div>
           ))}
-          {!challenges.list.length && <i>There are no pending challenges</i>}
+          {history.list.ownPendingEvents.map((event) => (
+            <Event key={event.id} isOwn {...event} setRoute={setRoute} onSave={handleSaveResult} />
+          ))}
+          {!challenges.list.length && !history.list.ownPendingEvents.length && (
+            <i>There are no pending challenges</i>
+          )}
         </div>
-        {!history.isLoaded && (
+        {!history.isShown && (
           <div className={styles.menu}>
-            <button className={appStyles.link} onClick={handleViewHistory}>
+            <button
+              className={appStyles.link}
+              onClick={() => setHistory((prevState) => ({ ...prevState, isShown: true }))}
+            >
               View History
             </button>
           </div>
         )}
         <div className={styles.list}>
           {history.isPending && <Logo style='min' />}
-          {history.isLoaded && renderHistory()}
+          {history.isShown && !history.isPending && renderHistory()}
         </div>
       </div>
     </div>

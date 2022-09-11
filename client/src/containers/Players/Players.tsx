@@ -13,14 +13,11 @@ const Players = () => {
   const { list: users, isLoaded: isLoadedUsers } = useStore(usersStore);
   const countries = useStore(countriesStore);
 
-  const [filter1Option, setFilter1Option] = useState<{
+  const [filterOption, setFilterOption] = useState<{
     value: string | number;
     text: string;
   } | null>(null);
-  const [filter2Option, setFilter2Option] = useState<{
-    value: string | number;
-    text: string;
-  } | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const menuItems = useMemo(
     () =>
@@ -32,30 +29,34 @@ const Players = () => {
   );
 
   useEffect(() => {
-    getUsers().catch((e) => console.log('Getting users error: ', e));
-  }, []);
+    const params = {
+      country: (filterOption?.value as string) || '',
+      searchQuery,
+    };
+    getUsers(params).catch((e) => console.log('Getting users error: ', e));
+  }, [filterOption, searchQuery]);
 
   const handleBack = () => setRoute({ event: null, link: 'profile' });
 
-  const handleFilter1Change = (option: { value: string | number; text: string }) => {
-    setFilter1Option(option);
+  const handleFilterChange = (option: { value: string | number; text: string } | null) => {
+    setFilterOption(option);
   };
 
-  const handleFilter2Change = (option: { value: string | number; text: string }) => {
-    setFilter2Option(option);
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
   };
 
   return (
     <PlayersView
       onClickBack={handleBack}
-      filter1Option={filter1Option}
-      filter2Option={filter2Option}
-      onFilter1Change={handleFilter1Change}
-      onFilter2Change={handleFilter2Change}
+      filterOption={filterOption}
+      onFilterChange={handleFilterChange}
       isLoadedUsers={isLoadedUsers}
       users={users}
       countries={countries}
       menuItems={menuItems}
+      searchQuery={searchQuery}
+      onSearch={handleSearch}
     />
   );
 };

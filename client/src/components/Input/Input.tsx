@@ -12,6 +12,7 @@ type TProps = {
   className?: string;
   onChange: (value: string, param: string) => void;
   param?: string;
+  placeholder?: string;
 };
 
 const Input = (props: TProps) => {
@@ -24,7 +25,13 @@ const Input = (props: TProps) => {
   return (
     <div className={cn(styles.input, className, { [styles.error]: !!error?.length })}>
       {label && <label htmlFor={id}>{label}</label>}
-      <input id={id} type={type} value={value} onChange={handleChange} />
+      <input
+        id={id}
+        type={type}
+        value={value}
+        placeholder={props.placeholder}
+        onChange={handleChange}
+      />
       {error && <span className={styles.inputError}>{error}</span>}
     </div>
   );

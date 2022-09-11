@@ -9,6 +9,7 @@ import Player from './containers/Player/Player';
 import Players from './containers/Players/Players';
 import NotFound from './containers/NotFound/NotFound';
 import Challenges from './containers/Challenges/Challenges';
+import Balance from './containers/Balance/Balance';
 
 import Popup from './components/Popup/Popup';
 import Logo from './components/Logo/Logo';
@@ -114,6 +115,8 @@ function App() {
         return <Players />;
       case 'challenges':
         return <Challenges link='profile' />;
+      case 'balance':
+        return <Balance link='profile' />;
       default:
         return <NotFound />;
     }

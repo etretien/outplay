@@ -1,35 +1,34 @@
+import { FunctionComponent, useMemo } from 'react';
 import cn from 'classnames';
+import { IoIosClose } from 'react-icons/io';
 
 import withInnerView from '../../hocs/withInnerView';
 
 import Select from '../../components/Select/Select';
 import Avatar from '../../components/Avatar/Avatar';
 import Menu from '../../components/Menu/Menu';
+import Input from '../../components/Input/Input';
 
 import { setRoute } from '../../stores/route';
 
 import { TUser } from '../../types/app-types';
 type TProps = {
   onClickBack: () => void;
-  filter1Option: {
+  filterOption: {
     value: string | number;
     text: string;
   } | null;
-  filter2Option: {
-    value: string | number;
-    text: string;
-  } | null;
-  onFilter1Change: (option: { value: string | number; text: string }) => void;
-  onFilter2Change: (option: { value: string | number; text: string }) => void;
+  onFilterChange: (option: { value: string | number; text: string } | null) => void;
   isLoadedUsers: boolean;
   users: TUser[];
   countries: { [field: string]: string };
   menuItems: { to: string; text: string; isActive: boolean; icon: JSX.Element }[];
+  searchQuery: string;
+  onSearch: (value: string) => void;
 };
 
 import styles from './Players.module.scss';
 import appStyles from '../../App.module.scss';
-import { FunctionComponent } from 'react';
 
 const UsersSkeleton = () => {
   return (
@@ -47,6 +46,13 @@ const UsersSkeleton = () => {
 };
 
 const PlayersView: FunctionComponent<TProps> = (props: TProps) => {
+  const countries: { value: string; text: string }[] = useMemo(() => {
+    return Object.entries(props.countries).map((item) => ({
+      value: item[0],
+      text: item[1],
+    }));
+  }, [props.countries]);
+
   return (
     <div className={styles.players}>
       <div className={appStyles.container}>
@@ -54,24 +60,24 @@ const PlayersView: FunctionComponent<TProps> = (props: TProps) => {
         <div className={styles.filters}>
           <div className={styles.filter}>
             <Select
-              selected={props.filter1Option}
+              selected={props.filterOption}
               placeholder='Filter'
-              options={[
-                { value: 'opt1', text: 'Option 1' },
-                { value: 'opt2', text: 'Option 2' },
-              ]}
-              onChange={props.onFilter1Change}
+              options={countries}
+              onChange={props.onFilterChange}
             />
+            {!!props.filterOption && (
+              <button className={appStyles.link} onClick={() => props.onFilterChange(null)}>
+                <IoIosClose />
+              </button>
+            )}
           </div>
           <div className={styles.filter}>
-            <Select
-              selected={props.filter2Option}
-              placeholder='Filter'
-              options={[
-                { value: 'opt1', text: 'Option 1' },
-                { value: 'opt2', text: 'Option 2' },
-              ]}
-              onChange={props.onFilter2Change}
+            <Input
+              id='search-player'
+              value={props.searchQuery}
+              type='text'
+              placeholder='Search'
+              onChange={props.onSearch}
             />
           </div>
         </div>
@@ -89,6 +95,7 @@ const PlayersView: FunctionComponent<TProps> = (props: TProps) => {
                     countryName={props.countries[user.countryCode]}
                     avatar={user.avatar}
                   />
+                  <div className={styles.rating}>{user.rating}</div>
                 </div>
                 <div className={styles.info}>
                   <p>{`${user.firstName} ${user.lastName}`}</p>

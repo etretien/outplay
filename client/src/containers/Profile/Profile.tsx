@@ -51,6 +51,10 @@ const Profile = (props: TProps) => {
     setRoute({ event: null, link: 'profile' });
   };
 
+  const handleBalance = () => {
+    setRoute({ event: null, link: 'balance' });
+  };
+
   const handleUploadAvatar = async (data: string | File, type: string) => {
     const img = type === 'IMAGE' ? await toBase64(data as File) : data;
     $api.patch(`users/${currentUser!.id}`, { avatar: img, avatarType: type }).then((response) => {
@@ -116,7 +120,7 @@ const Profile = (props: TProps) => {
       onClick={handleClick}
       currentUser={currentUser}
       countries={countries}
-      isOwner={isOwner}
+      isOwner={isOwner || currentUser?.id === profile?.id}
       onUploadAvatar={handleUploadAvatar}
       isLoaded={isLoaded}
       onFieldChange={handleFieldChange}
@@ -125,6 +129,7 @@ const Profile = (props: TProps) => {
       onLogout={handleLogout}
       menuItems={menuItems}
       onChallengePlayer={handleChallenge}
+      onBalance={handleBalance}
     />
   );
 };

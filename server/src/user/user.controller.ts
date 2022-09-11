@@ -49,7 +49,14 @@ export class UserController {
   async getUsers(@Query() query: Record<string, string>) {
     const limit = query.limit ? +query.limit : 10;
     const offset = query.offset ? +query.offset : 0;
-    const { users, total } = await this.userService.getUsers(limit, offset);
+    const country = query.country || '';
+    const search = query.searchQuery || '';
+    const { users, total } = await this.userService.getUsers(
+      limit,
+      offset,
+      country,
+      search,
+    );
     return {
       users,
       pagination: {

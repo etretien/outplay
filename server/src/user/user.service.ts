@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 
@@ -124,13 +124,22 @@ export class UserService {
     return undefined;
   }
 
-  async getUsers(limit: number, offset: number) {
+  async getUsers(
+    limit: number,
+    offset: number,
+    country: string,
+    search: string,
+  ) {
+    const [firstName, lastName = ''] = search.split(' ');
     const [users, total] = await this.userRepository.findAndCount({
       order: {
         rating: 'DESC',
       },
       where: {
         status: STATUS.ACTIVE,
+        countryCode: country.length ? country : undefined,
+        firstName: firstName.length ? ILike(`${firstName}%`) : undefined,
+        lastName: lastName.length ? ILike(`${lastName}%`) : undefined,
       },
       skip: offset,
       take: limit,

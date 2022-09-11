@@ -1,0 +1,129 @@
+@import "../../common-styles/variables.scss";
+
+.balanceBlock,
+.history {
+  background-color: $white;
+  border-radius: $border-radius;
+  padding: 24px;
+  width: 100%;
+  display: flex;
+}
+
+.history {
+  margin-top: 24px;
+  flex-direction: column;
+  min-height: 220px;
+}
+
+.block {
+  width: 45%;
+}
+
+.block:last-of-type {
+  padding-left: 64px;
+}
+
+.value {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.currency {
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.token > p {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.token div {
+  display: flex;
+  align-items: center;
+}
+
+.token div p {
+  margin: 0;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.token div button {
+  color: $gray-500;
+}
+
+.iconBlock {
+  width: 5%;
+
+  button {
+    color: $gray-500;
+    position: relative;
+    top: 40%;
+
+    svg {
+      width: 25px;
+      height: 25px;
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+
+  button {
+    color: $gray-500;
+    display: block;
+    padding: 0;
+    height: 50px;
+    width: 50px;
+
+    svg {
+      width: 50px;
+      height: 50px;
+    }
+
+    &:last-of-type {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.balanceBlockError {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 24px;
+  }
+
+  svg path {
+    fill: $gray-500;
+  }
+}
+
+@media screen and (max-width: 510px) {
+
+  .balanceBlock {
+    flex-direction: column;
+  }
+
+  .iconBlock {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 16px 0;
+  }
+
+  .block:last-of-type {
+    padding-left: 0;
+  }
+}

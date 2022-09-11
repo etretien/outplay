@@ -1,6 +1,7 @@
 import { action, atom } from 'nanostores';
 
 import { getChallenges } from './challenges';
+import { getMinima } from './minima';
 
 import { TUser } from '../types/app-types';
 
@@ -16,7 +17,9 @@ export const getProfile = action(profile, 'getProfile', async (store) => {
 export const setProfile = action(profile, 'setProfile', async (store, payload) => {
   if (payload.profile && payload.profile.id) {
     await getChallenges(payload.profile.id);
+    getMinima().catch((e) => console.log(e));
   }
   store.set(payload);
+
   return store.get();
 });

@@ -14,6 +14,17 @@
     width: 100%;
     margin-top: 60px;
     min-height: 28px;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+
+      svg {
+        margin-left: 16px;
+      }
+    }
   }
 
   h1 {

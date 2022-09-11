@@ -22,8 +22,20 @@
     outline: none;
     background-color: transparent;
     cursor: pointer;
-    width: 130px;
+    width: calc(100% / 3);
     white-space: nowrap;
+  }
+
+  button:nth-child(1) {
+    text-align: left;
+  }
+
+  button:nth-child(2) {
+    padding-left: 40px;
+  }
+
+  button:nth-child(3) {
+    text-align: right;
   }
 
   button:not(:last-of-type) {

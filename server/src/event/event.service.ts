@@ -101,8 +101,12 @@ export class EventService {
 
   async setChallengeResult(id: number, data: EventPatchDto) {
     const resultByUsers = [];
-    const team1Result = data.sets.reduce((acc, item) => acc + item.team1, 0);
-    const team2Result = data.sets.reduce((acc, item) => acc + item.team2, 0);
+    let team1Result = 0;
+    let team2Result = 0;
+    data.sets.forEach((set) => {
+      if (set.team1 > set.team2) team1Result += 1;
+      if (set.team1 < set.team2) team2Result += 1;
+    });
     data.team1.forEach((member) => {
       let point = 0;
       if (team1Result > team2Result) point = 2;
