@@ -118,6 +118,7 @@ export class UserService {
       );
       return { success: !!message.messageId, activationLink };
     } catch (e) {
+      console.log(e);
       return { success: false, error: e, activationLink };
     }
   }
