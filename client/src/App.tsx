@@ -16,6 +16,7 @@ import Logo from './components/Logo/Logo';
 
 import { getCountries } from './stores/countries';
 import { setAccessToken } from './stores/accessToken';
+import { getMinimaSettings } from './stores/minima';
 
 import { popup as popupStore, setPopup } from './stores/popup';
 import { route as routeStore, setRoute } from './stores/route';
@@ -41,6 +42,7 @@ function App() {
   const [refreshToken] = useState<string | null>(localStorage.getItem(REFRESH_TOKEN_NAME));
   const [userEmail] = useState<string | null>(localStorage.getItem(USER_EMAIL_NAME));
   const [visitorId, setVisitorId] = useState<string>('');
+  const [minimaError, setMinimaError] = useState<boolean>(false);
 
   useEffect(() => {
     if (user.profile) {
@@ -79,7 +81,16 @@ function App() {
               localStorage.setItem(REFRESH_TOKEN_NAME, response.data.refreshToken);
               setAccessToken(response.data.accessToken);
               setProfile({ profile: response.data.user, isLoaded: true });
-              setRoute({ event: null, link: 'profile' });
+              getMinimaSettings()
+                .catch(() => {
+                  setPopup({
+                    title: 'Minima Error',
+                    message: 'Could not retrieve data',
+                    description: [],
+                  });
+                  setMinimaError(true);
+                })
+                .finally(() => setRoute({ event: null, link: 'profile' }));
             })
             .catch(() => setRoute({ event: null, link: 'sign-in' }))
             .finally(() => setIsLoading(false));
@@ -124,6 +135,7 @@ function App() {
 
   return (
     <div className={cn(styles.app, { [styles['app--loading']]: isLoading })}>
+      {minimaError && <div className={styles.minimaError}>Could not connect to Minima</div>}
       {isLoading ? <Logo style='max' /> : renderComponent()}
       {popup.title && (
         <Popup

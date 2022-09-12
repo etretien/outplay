@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsArray,
   IsNotEmpty,
+  IsBoolean,
 } from 'class-validator';
 import { TYPE } from '../avatar/avatar.dto';
 
@@ -26,4 +27,10 @@ export class EventPatchDto {
 
   @IsNotEmpty()
   sets: { team1: number; team2: number }[];
+}
+
+export class EventPaidDto {
+  @IsNotEmpty()
+  @IsBoolean({ message: 'isPaid must be boolean' })
+  isPaid: boolean;
 }

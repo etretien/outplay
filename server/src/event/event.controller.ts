@@ -12,7 +12,7 @@ import { AccessTokenGuard } from '../core/guards/access-token.guard';
 
 import { EventService } from './event.service';
 
-import { EventPatchDto } from './event.dto';
+import { EventPaidDto, EventPatchDto } from './event.dto';
 
 @Controller('events')
 export class EventController {
@@ -28,8 +28,11 @@ export class EventController {
   @Patch(':id')
   async setChallengeResult(
     @Param('id') id: number,
-    @Body() data: EventPatchDto,
+    @Body() data: EventPatchDto | EventPaidDto,
   ) {
-    return this.eventService.setChallengeResult(id, data);
+    if ((data as EventPatchDto).sets) {
+      return this.eventService.setChallengeResult(id, data as EventPatchDto);
+    }
+    return this.eventService.setPaid(id, (data as EventPaidDto).isPaid);
   }
 }

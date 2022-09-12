@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 
@@ -170,5 +170,14 @@ export class EventService {
     }
 
     return { success };
+  }
+
+  async setPaid(id: number, isPaid: boolean) {
+    const event = await this.eventRepository.findOneBy({ id });
+    if (!event)
+      throw new HttpException('Event was not found', HttpStatus.BAD_REQUEST);
+
+    event.isPaid = isPaid;
+    return this.eventRepository.save(event);
   }
 }

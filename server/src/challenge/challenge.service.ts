@@ -39,6 +39,7 @@ export class ChallengeService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     let success = true;
+    let eventId = null;
     try {
       const event = new EventEntity();
       event.creator = creator;
@@ -47,6 +48,7 @@ export class ChallengeService {
       event.winners = [];
 
       const generatedEvent = await this.eventRepository.save(event);
+      eventId = generatedEvent.id;
       let coef = await this.coefRepository.findOne({
         where: { value: TYPE.STANDARD },
       });
@@ -75,7 +77,7 @@ export class ChallengeService {
       await queryRunner.release();
     }
 
-    return { success };
+    return { success, eventId };
   }
 
   async getChallenges(query: Record<string, string>) {

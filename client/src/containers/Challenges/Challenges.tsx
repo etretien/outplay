@@ -9,6 +9,7 @@ import Button from '../../components/Button/Button';
 import { challenges as challengesStore, getChallenges } from '../../stores/challenges';
 import { profile as profileStore } from '../../stores/profile';
 import { setRoute } from '../../stores/route';
+import { minimaSettings as minimaSettingsStore } from '../../stores/minima';
 
 import styles from './Challenges.module.scss';
 import appStyles from '../../App.module.scss';
@@ -45,6 +46,7 @@ import { TEvent } from '../../types/app-types';
 const Challenges = () => {
   const challenges = useStore(challengesStore);
   const { profile } = useStore(profileStore);
+  const minimaSettings = useStore(minimaSettingsStore);
 
   const [history, setHistory] = useState<{
     isShown: boolean;
@@ -103,7 +105,14 @@ const Challenges = () => {
         {history.list.ownEvents.length === 0 && <i>There are no challenges</i>}
         {history.list.ownEvents.length > 0 &&
           history.list.ownEvents.map((event) => (
-            <Event key={event.id} isOwn {...event} setRoute={setRoute} onSave={handleSaveResult} />
+            <Event
+              key={event.id}
+              isOwn
+              {...event}
+              setRoute={setRoute}
+              disableResults={!minimaSettings.scriptAddress}
+              onSave={handleSaveResult}
+            />
           ))}
         <h2>Challenges to me</h2>
         {history.list.participant.length === 0 && <i>There are no challenges</i>}
@@ -145,7 +154,14 @@ const Challenges = () => {
             </div>
           ))}
           {history.list.ownPendingEvents.map((event) => (
-            <Event key={event.id} isOwn {...event} setRoute={setRoute} onSave={handleSaveResult} />
+            <Event
+              key={event.id}
+              isOwn
+              {...event}
+              disableResults={!minimaSettings.scriptAddress}
+              setRoute={setRoute}
+              onSave={handleSaveResult}
+            />
           ))}
           {!challenges.list.length && !history.list.ownPendingEvents.length && (
             <i>There are no pending challenges</i>

@@ -32,6 +32,7 @@ import { TEvent } from '../../../types/app-types';
 type TAdditionalProps = {
   setRoute: (params: { event: MouseEvent | null; link: string }) => void;
   isOwn: boolean;
+  disableResults?: boolean;
   onSave?: (id: number, data: Record<string, any>) => void;
 };
 
@@ -95,6 +96,7 @@ const Event = (props: TEvent & TAdditionalProps) => {
             <Button
               text='Set Result'
               className={styles.result}
+              disabled={props.disableResults}
               onClick={() => setResultView(true)}
               color='green'
             />

@@ -72,7 +72,6 @@
 
 .actions {
   display: flex;
-  justify-content: space-between;
 
   button {
     color: $gray-500;
@@ -80,14 +79,11 @@
     padding: 0;
     height: 50px;
     width: 50px;
+    transform: rotate(180deg);
 
     svg {
       width: 50px;
       height: 50px;
-    }
-
-    &:last-of-type {
-      transform: rotate(180deg);
     }
   }
 }
@@ -106,6 +102,56 @@
 
   svg path {
     fill: $gray-500;
+  }
+}
+
+.importBlock {
+  display: flex;
+  align-items: center;
+
+  button,
+  input {
+    background-color: transparent;
+    border: unset;
+    outline: none;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  input {
+    width: 75px;
+    height: 20px;
+    padding: 16px;
+    background-color: $white;
+    border-radius: $border-radius;
+    border: 1px solid $gray-500;
+  }
+
+  button {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin-left: 8px;
+    transform: rotate(0deg);
+    cursor: pointer;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    &:first-of-type {
+      path {
+        fill: $green-500;
+      }
+    }
+    &:last-of-type {
+      path {
+        fill: red;
+      }
+    }
   }
 }
 

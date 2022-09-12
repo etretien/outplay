@@ -48,6 +48,9 @@ class EventEntity {
   })
   status: STATUS;
 
+  @Column({ type: 'boolean', default: false })
+  isPaid: boolean;
+
   @ManyToMany(() => UserEntity)
   @JoinTable()
   participants: Relation<UserEntity[]>;

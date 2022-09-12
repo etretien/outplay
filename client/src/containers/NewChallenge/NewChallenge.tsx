@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '@nanostores/react';
 
 import $api from '../../api';
+import MinimaHelper from '../../helpers/minima';
 
 import { users as usersStore, getUsers } from '../../stores/users';
 import { countries as countriesStore } from '../../stores/countries';
@@ -24,6 +25,7 @@ const NewChallenge = (props: TProps) => {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const currentUsers = useMemo(
     () => users.list.filter((item) => item.id !== user.profile!.id),
@@ -64,6 +66,7 @@ const NewChallenge = (props: TProps) => {
       setErrors(errors);
       return;
     }
+    setIsLoading(true);
 
     $api
       .post('challenges', {
@@ -71,8 +74,10 @@ const NewChallenge = (props: TProps) => {
         userIds: selected,
         eventName: name,
       })
-      .then((response) => {
+      .then(async (response) => {
         if (response.data.success) {
+          await MinimaHelper.sendChallenge(selected.length);
+          await $api.post(`events/${response.data.eventId}`, { isPaid: true });
           setPopup({
             title: 'Challenge created',
             message: 'Challenge was successfully created',
@@ -87,11 +92,22 @@ const NewChallenge = (props: TProps) => {
           });
         }
       })
-      .catch((e) => console.log('Creating challenge error: ', e));
+      .catch((e) => {
+        if (e.error) {
+          setPopup({
+            title: 'Minima error',
+            message: 'Challenge was created, but Minima transaction has failed',
+            description: [],
+          });
+          props.onCancel();
+        }
+      })
+      .finally(() => setIsLoading(false));
   };
 
   return (
     <NewChallengeView
+      isLoading={isLoading}
       users={currentUsers}
       selected={selected}
       onUserClick={handleUserClick}

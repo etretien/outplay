@@ -27,6 +27,7 @@ type TProps = {
   onLogout: () => void;
   onBalance: () => void;
   menuItems: { to: string; text: string; isActive: boolean; icon: JSX.Element }[];
+  disableActions: boolean;
   onChallengePlayer: (id: number) => void;
 };
 
@@ -38,6 +39,7 @@ const ProfileView = (props: TProps) => {
         className={currentStyles.newChallenge}
         text='New challenge'
         onClick={props.onModeChange}
+        disabled={props.disableActions}
         size='l'
       />
     );
@@ -48,6 +50,7 @@ const ProfileView = (props: TProps) => {
       <Button
         className={currentStyles.newChallenge}
         text='Challenge player'
+        disabled={props.disableActions}
         onClick={() => props.onChallengePlayer(props.currentUser!.id)}
         size='l'
       />
@@ -74,7 +77,11 @@ const ProfileView = (props: TProps) => {
           <>
             <h2>
               {props.isOwner && props.currentUser && (
-                <button className={styles.link} onClick={props.onBalance}>
+                <button
+                  className={styles.link}
+                  onClick={props.onBalance}
+                  disabled={props.disableActions}
+                >
                   Token Balance
                   <FaWallet />
                 </button>

@@ -9,6 +9,7 @@ import { profile as profileStore, setProfile } from '../../stores/profile';
 import { setRoute } from '../../stores/route';
 import { countries as countriesStore } from '../../stores/countries';
 import { challenges as challengesStore } from '../../stores/challenges';
+import { minimaSettings as minimaSettingsStore } from '../../stores/minima';
 
 import { toBase64 } from '../../helpers/converters';
 
@@ -16,6 +17,7 @@ import ProfileView from './Profile.view';
 
 import { TUser } from '../../types/app-types';
 import { setPopup } from '../../stores/popup';
+import MinimaHelper from '../../helpers/minima';
 
 type TProps = {
   isOwner?: boolean;
@@ -29,6 +31,7 @@ const Profile = (props: TProps) => {
   const { profile, isLoaded } = useStore(profileStore);
   const countries = useStore(countriesStore);
   const challenges = useStore(challengesStore);
+  const minimaSettings = useStore(minimaSettingsStore);
 
   const [currentUser, setCurrentUser] = useState<TUser | null>(propUser || profile || null);
   const [challengeMode, setChallengeMode] = useState<boolean>(false);
@@ -96,8 +99,10 @@ const Profile = (props: TProps) => {
         userIds: [id],
         eventName: 'PVP Challenge',
       })
-      .then((response) => {
+      .then(async (response) => {
         if (response.data.success) {
+          await MinimaHelper.sendChallenge(1);
+          await $api.post(`events/${response.data.eventId}`, { isPaid: true });
           setPopup({
             title: 'Challenge created',
             message: 'Challenge was successfully created',
@@ -111,7 +116,15 @@ const Profile = (props: TProps) => {
           });
         }
       })
-      .catch((e) => console.log('Creating challenge error: ', e));
+      .catch((e) => {
+        if (e.error) {
+          setPopup({
+            title: 'Minima error',
+            message: 'Challenge was created, but Minima transaction has failed',
+            description: [],
+          });
+        }
+      });
   };
 
   return (
@@ -128,6 +141,7 @@ const Profile = (props: TProps) => {
       onModeChange={handleModeChange}
       onLogout={handleLogout}
       menuItems={menuItems}
+      disableActions={!minimaSettings.address}
       onChallengePlayer={handleChallenge}
       onBalance={handleBalance}
     />

@@ -1,53 +1,28 @@
 import { action, atom } from 'nanostores';
 
-export const minima = atom<{
-  minimaBalance: null | number;
-  outplayBalance: null | number;
-  error: boolean;
+import MinimaHelper from '../helpers/minima';
+
+export const minimaSettings = atom<{
+  scriptAddress: null | string;
+  address: null | string;
+  publicKey: null | string;
 }>({
-  minimaBalance: null,
-  outplayBalance: null,
-  error: false,
+  scriptAddress: null,
+  address: null,
+  publicKey: null,
 });
 
-export const getMinima = action(minima, 'getMinima', async (store) => {
+export const getMinimaSettings = action(minimaSettings, 'getMinimaSettings', async (store) => {
   try {
-    window.MDS.cmd('balance', function (balanceReturn) {
-      if (balanceReturn.response) {
-        const minimaToken = balanceReturn.response.find(
-          (item: { token: string }) => item.token === 'Minima',
-        );
-        const outplayToken = balanceReturn.response.find(
-          (item: { token: { name: string } }) => item.token.name === 'Outplay',
-        );
-        setMinima({
-          minimaBalance: Math.round(minimaToken.sendable),
-          outplayBalance: Math.round(outplayToken.sendable),
-          error: false,
-        });
-
-        // properly we should look for tokenid (0x00 for Minima and 0x.... for Outplay)
-      } else {
-        setMinima({
-          minimaBalance: null,
-          outplayBalance: null,
-          error: true,
-        });
-      }
+    const scriptAddress = (await MinimaHelper.getScriptAddress()) as Record<string, string>;
+    const address = (await MinimaHelper.getAddress()) as Record<string, string>;
+    await MinimaHelper.importCoin();
+    store.set({
+      scriptAddress: scriptAddress.address,
+      address: address.address,
+      publicKey: address.publicKey,
     });
-  } catch (e) {
-    console.log('Minima error: ', e);
-    setMinima({
-      minimaBalance: null,
-      outplayBalance: null,
-      error: true,
-    });
+  } catch {
+    throw new Error('Minima Error');
   }
-
-  return store.get();
-});
-
-export const setMinima = action(minima, 'setMinima', async (store, payload) => {
-  store.set(payload);
-  return store.get();
 });

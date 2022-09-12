@@ -17,7 +17,7 @@ export const getProfile = action(profile, 'getProfile', async (store) => {
 export const setProfile = action(profile, 'setProfile', async (store, payload) => {
   if (payload.profile && payload.profile.id) {
     await getChallenges(payload.profile.id);
-    getMinima().catch((e) => console.log(e));
+    //getMinima().catch((e) => console.log(e));
   }
   store.set(payload);
 

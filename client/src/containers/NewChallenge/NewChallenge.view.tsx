@@ -4,8 +4,10 @@ import cn from 'classnames';
 import Avatar from '../../components/Avatar/Avatar';
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
+import Logo from '../../components/Logo/Logo';
 
 import styles from './NewChallenge.module.scss';
+import appStyles from '../../App.module.scss';
 
 import { TUser } from '../../types/app-types';
 
@@ -18,6 +20,7 @@ type TProps = {
   startDate: string;
   endDate: string;
   errors: Record<string, string>;
+  isLoading: boolean;
   onChangeName: (value: string) => void;
   onChangeDate: (value: string, param: string) => void;
   onCancel: () => void;
@@ -27,6 +30,11 @@ type TProps = {
 const NewChallengeView = (props: TProps) => {
   return (
     <div className={styles.newChallenge}>
+      {props.isLoading && (
+        <div className={appStyles.import}>
+          <Logo style='min' />
+        </div>
+      )}
       <div className={styles.list}>
         {props.users.map((user: TUser) => {
           const isSelected = props.selected.includes(user.id);
