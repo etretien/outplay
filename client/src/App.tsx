@@ -119,7 +119,7 @@ function App() {
       case 'forgot-password':
       case 'activate':
       case 'restore-password':
-        return <Auth visitorId={visitorId} />;
+        return <Auth visitorId={visitorId} onMinimaError={() => setMinimaError(true)} />;
       case 'profile':
         return <Profile />;
       case 'players':

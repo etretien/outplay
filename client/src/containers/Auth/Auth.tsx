@@ -20,8 +20,9 @@ import { setProfile } from '../../stores/profile';
 import { REFRESH_TOKEN_NAME, USER_EMAIL_NAME } from '../../helpers/consts';
 
 import styles from './Auth.module.scss';
+import { getMinimaSettings } from '../../stores/minima';
 
-const Auth = (props: { visitorId: string }) => {
+const Auth = (props: { visitorId: string; onMinimaError: () => void }) => {
   const route = useStore(routeStore);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const restoreCode = useRef<null | { code: string; id: number }>(null);
@@ -52,8 +53,17 @@ const Auth = (props: { visitorId: string }) => {
         localStorage.setItem(REFRESH_TOKEN_NAME, response.data.refreshToken);
         localStorage.setItem(USER_EMAIL_NAME, email);
         setAccessToken(response.data.accessToken);
-        setRoute({ event: null, link: 'profile' });
         setProfile({ profile: response.data.user, isLoaded: true });
+        getMinimaSettings()
+          .catch(() => {
+            setPopup({
+              title: 'Minima Error',
+              message: 'Could not retrieve data',
+              description: [],
+            });
+            props.onMinimaError();
+          })
+          .finally(() => setRoute({ event: null, link: 'profile' }));
       })
       .catch((e) => {
         if (e.statusCode === 403) {
