@@ -1,7 +1,6 @@
 import { action, atom } from 'nanostores';
 
 import { getChallenges } from './challenges';
-import { getMinima } from './minima';
 
 import { TUser } from '../types/app-types';
 
