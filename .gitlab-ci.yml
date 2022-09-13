@@ -49,9 +49,8 @@ deploy_front:
   tags:
     - outplay-onhost
   script:
-    - rm -rf /tmp/front
-    - mkdir /tmp/front
-    - cp -r client/dist/* /tmp/front
+    - sudo cp -r client/dist/* /home/minima/.minima_102_9121/0.103/mds/web/0x191268E13E87180A6EF20BF40AC6480E/
+    - sudo chown -R minima:minima /home/minima/.minima_102_9121/0.103/mds/web/0x191268E13E87180A6EF20BF40AC6480E
   dependencies:
     - build_front
   needs:
