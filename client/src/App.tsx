@@ -45,6 +45,10 @@ function App() {
   const [minimaError, setMinimaError] = useState<boolean>(false);
 
   useEffect(() => {
+    window.MDS.init();
+  }, []);
+
+  useEffect(() => {
     if (user.profile) {
       interval.current = setInterval(getChallenges.bind(null, user.profile.id), 30 * 1000);
       return () => {
