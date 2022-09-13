@@ -22,6 +22,8 @@ import { REFRESH_TOKEN_NAME, USER_EMAIL_NAME } from '../../helpers/consts';
 import styles from './Auth.module.scss';
 import { getMinimaSettings } from '../../stores/minima';
 
+window.MDS.init();
+
 const Auth = (props: { visitorId: string; onMinimaError: () => void }) => {
   const route = useStore(routeStore);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -58,7 +60,7 @@ const Auth = (props: { visitorId: string; onMinimaError: () => void }) => {
           .catch(() => {
             setPopup({
               title: 'Minima Error',
-              message: 'Could not retrieve data',
+              message: 'Could not retrieve data (A)',
               description: [],
             });
             props.onMinimaError();
