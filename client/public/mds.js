@@ -177,7 +177,8 @@ function PollListener() {
     }
 
     //And around we go again..
-    PollListener();
+    // stop madness when failed to connect
+    //PollListener();
   });
 }
 
