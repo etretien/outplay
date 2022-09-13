@@ -83,7 +83,7 @@ var MDS = {
     }
 
     //The ports..
-    var mainport = port + 1;
+    var mainport = port ? port + 1 : 9002;
 
     MDS.log('MDS FILEHOST  : https://' + host + ':' + port + '/');
 
