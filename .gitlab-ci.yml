@@ -31,7 +31,7 @@ build_server:
     - docker push ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_SHA}
     - docker push ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:latest
 
-deploy:
+deploy_server:
   stage: deploy
   image: docker/compose:latest
   tags:
@@ -43,3 +43,15 @@ deploy:
     - docker-compose up -d --force-recreate
   needs:
     - job: build_server
+
+deploy_front:
+  stage: deploy
+  tags:
+    - outplay-onhost
+  script:
+    - sudo cp -r client/dist/* /home/minima/.minima_102_9121/0.103/mds/web/0x191268E13E87180A6EF20BF40AC6480E/
+    - sudo chown -R minima:minima /home/minima/.minima_102_9121/0.103/mds/web/0x191268E13E87180A6EF20BF40AC6480E
+  dependencies:
+    - build_front
+  needs:
+    - job: build_front
