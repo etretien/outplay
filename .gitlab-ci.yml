@@ -31,7 +31,7 @@ build_server:
     - docker push ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_SHA}
     - docker push ${DOCKER_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:latest
 
-deploy:
+deploy_server:
   stage: deploy
   image: docker/compose:latest
   tags:
@@ -43,3 +43,16 @@ deploy:
     - docker-compose up -d --force-recreate
   needs:
     - job: build_server
+
+deploy_front:
+  stage: deploy
+  tags:
+    - outplay-onhost
+  script:
+    - rm -rf /tmp/front
+    - mkdir /tmp/front
+    - cp -r client/dist/* /tmp/front
+  dependencies:
+    - build_front
+  needs:
+    - job: build_front
