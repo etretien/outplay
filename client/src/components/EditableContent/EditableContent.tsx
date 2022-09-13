@@ -10,6 +10,7 @@ type TProps = {
   label: string;
   maxLength: number;
   param?: string;
+  canEdit: boolean;
   onChange: (value: string, param: string | undefined) => void;
 };
 
@@ -55,9 +56,11 @@ const EditableContent = (props: TProps) => {
 
   return (
     <div className={styles.editable}>
-      <button onClick={() => setIsEditMode(true)}>
-        <FaPen />
-      </button>
+      {props.canEdit && (
+        <button onClick={() => setIsEditMode(true)}>
+          <FaPen />
+        </button>
+      )}
       <p>{`${props.label}: ${props.value}`}</p>
     </div>
   );

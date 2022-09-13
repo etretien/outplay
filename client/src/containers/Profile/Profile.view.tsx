@@ -100,6 +100,7 @@ const ProfileView = (props: TProps) => {
                       label={`About ${props.currentUser.firstName}`}
                       maxLength={100}
                       param='about'
+                      canEdit={props.isOwner}
                       onChange={props.onFieldChange}
                     />
                   </div>
@@ -109,6 +110,7 @@ const ProfileView = (props: TProps) => {
                       label='Game level'
                       maxLength={100}
                       param='gameLevel'
+                      canEdit={props.isOwner}
                       onChange={props.onFieldChange}
                     />
                   </div>
