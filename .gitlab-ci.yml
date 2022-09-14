@@ -41,6 +41,7 @@ deploy_server:
   script:
     - cd server
     - docker-compose up -d --force-recreate
+    - docker image prune -af
   needs:
     - job: build_server
 
