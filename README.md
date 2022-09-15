@@ -13,8 +13,6 @@ Implementation plan: adding group competitions, as well as the display of NFTs t
 
 ## Challenges
 User A challenges User B to a game. If User B accepts the challenge, both A and B are locked out of an equal amount of x App tokens (Outplay) until the result of the game is added to the App. Thus, the prize fund of the challenge is equal to 2x Application tokens. After adding the result, the winner receives the entire prize fund of the game (2x Outplay).
-Please note: we’re still having an issue in the Dapp regarding Minima interaction (our developers have been in contact with Minima support on this), as follows. Application logic is based ​​on OUTPLAY tokens (based on Minima), these tokens would be given to users for different activities or in exchange for Minima tokens, and could be spent on the challenges. We wrote a smart-contract and sent a few OUTPLAY tokens to it, but we couldn’t get them to show up on a test client device for interacting with them (e.g. exchange).
-Implementation plan: If the winner has NFT, then he also receives an additional bonus from the application. The loser will still lose only the x App tokens wagered on the game. Some NFTs may guarantee an additional reward in the event of a loss.
 
 ## Player rating
 Player rating is available to all users. It is also possible to search by the list of players.
